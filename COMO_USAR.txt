@@ -1,0 +1,7 @@
+﻿COMO USAR O LeadBot
+
+1) Va na Area de Trabalho e clique em LeadBot
+2) Abra http://localhost:8787 no navegador
+3) Clique em INICIAR
+4) Escaneie o QR Code que aparece no terminal
+5) Pronto! Os anuncios vao para planilha automaticamente

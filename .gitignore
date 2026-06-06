@@ -1,0 +1,25 @@
+# Objetos e binários
+*.o
+*.bin
+*.elf
+*.img
+*.iso
+
+# Executáveis
+microcoop.bin
+kernel/kernel.elf
+
+# Diretórios de build
+build/
+dist/
+
+# IDE e editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Sistema
+.DS_Store
+Thumbs.db
