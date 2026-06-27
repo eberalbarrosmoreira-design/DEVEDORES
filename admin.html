@@ -228,7 +228,46 @@ h2{font-size:16px;color:#94A3B8;margin:20px 0 12px;font-weight:600;text-transfor
   
   function renderPrev(){var e=document.getElementById("prev");if(e)e.textContent=gCode();}
   
-  login();
+
+  window.publicarCliente=function(cliId){
+    var btn=document.getElementById("btnPub");
+    var st=document.getElementById("stPub"),er=document.getElementById("erPub");
+    st.style.display="none";er.style.display="none";
+    var tokenUsar=cfg.token||document.getElementById("iToken").value.trim();
+    if(!tokenUsar||tokenUsar.length<10){er.textContent="? Token invalido!";er.style.display="block";return;}
+    
+    var cli=null;
+    for(var i=0;i<cli.length;i++){if(cli[i].id==cliId){cli=cli[i];break;}}
+    if(!cli){er.textContent="? Cliente nao encontrado!";er.style.display="block";return;}
+    
+    btn.innerHTML='<span class="spinner"></span> Publicando dados do cliente...';btn.disabled=true;
+    
+    var fileName="dados_"+cli.id+".json";
+    var fileContent=JSON.stringify({cliente:cli.nome,devedores:[],dispositivos:[]});
+    var enc=new TextEncoder(),bytes=enc.encode(fileContent),bin="";
+    for(var i=0;i<bytes.length;i++)bin+=String.fromCharCode(bytes[i]);
+    var b64=btoa(bin);
+    
+    var url=API+"/repos/"+cfg.user+"/"+cfg.repo+"/contents/"+fileName;
+    
+    // Tenta pegar sha se ja existe
+    fetch(url,{headers:{"Authorization":"token "+tokenUsar,"Accept":"application/vnd.github.v3+json"}})
+    .then(function(r){
+      if(r.status===404)return null;
+      return r.json();
+    })
+    .then(function(existente){
+      var sha=existente?existente.sha:null;
+      var body={message:"Admin: criar dados do cliente "+cli.nome,content:b64};
+      if(sha)body.sha=sha;
+      return fetch(url,{method:"PUT",headers:{"Authorization":"token "+tokenUsar,"Accept":"application/vnd.github.v3+json","Content-Type":"application/json"},body:JSON.stringify(body)}).then(function(r){return r.json();});
+    })
+    .then(function(r){
+      if(r.content){msg("? Dados do cliente \""+cli.nome+"\" publicados!");}else throw new Error(r.message||"Erro");
+    })
+    .catch(function(e){er.textContent="? "+e.message;er.style.display="block";})
+    .finally(function(){btn.innerHTML="? Publicar Agora";btn.disabled=false;});
+  };    login();
 })();
 </script>
 </body>

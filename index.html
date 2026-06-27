@@ -171,14 +171,14 @@ input,select,textarea,button{font-size:16px!important;font-family:inherit}
   }
   var STATUS={"Pendente":{bg:"#FFF3CD",color:"#856404",dot:"#FFC107"},"Pago":{bg:"#D1FAE5",color:"#065F46",dot:"#10B981"},"Pago Parcial":{bg:"#FEE2CC",color:"#92400E",dot:"#F97316"},"Vencido":{bg:"#FEE2E2",color:"#991B1B",dot:"#EF4444"}};
   var EMPTY={nome:"",contato:"",pix:"",profissao:"",residencia:"",dataEmprestimo:"",valor:"",dataVencimento:"",status:"Pendente",obs:""};
-  var KEY="devedores_app";
+  var KEY='d_';function chaveDados(){var h=AUTH._clienteHash||'anon';return KEY+h.substring(0,12);}
   var S={devedores:[],view:"lista",form:{},editId:null,detailId:null,filtro:"Todos",busca:"",msg:""};
   for(var k in EMPTY)S.form[k]=EMPTY[k];
   var ICONS={lupa:String.fromCodePoint(0x1F50D),user:String.fromCodePoint(0x1F464),check:String.fromCodePoint(0x2705),x:String.fromCodePoint(0x274C),edit:String.fromCodePoint(0x270F),trash:String.fromCodePoint(0x1F5D1),plus:String.fromCodePoint(0x2795),left:String.fromCodePoint(0x2B05),csv:String.fromCodePoint(0x1F4C4),json:String.fromCodePoint(0x1F4CB),importI:String.fromCodePoint(0x1F4E5),search:String.fromCodePoint(0x1F50D)};
   function fmt(v){var n=parseFloat(String(v).replace(",","."));return isNaN(n)?"R$ 0,00":n.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});}
   function pv(v){return parseFloat(String(v).replace(",","."))||0;}
   function esc(t){if(!t)return"";return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-  function salvar(arr){try{localStorage.setItem(KEY,JSON.stringify(arr))}catch(e){}S.devedores=arr;render();}
+  function salvar(arr){try{localStorage.setItem(chaveDados(),JSON.stringify(arr))}catch(e){}S.devedores=arr;render();}
   function msg(t){S.msg=t;render();setTimeout(function(){S.msg="";render()},2500);}
   function dload(blob,nome){var url=URL.createObjectURL(blob);var iOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);if(iOS){window.open(url,'_blank');setTimeout(function(){URL.revokeObjectURL(url)},5000);}else{var a=document.createElement("a");a.href=url;a.download=nome;a.target="_blank";document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(url)},1000);}}
   function expCSV(){if(!S.devedores.length){msg("Nenhum dado!");return;}var h="Nome,Contato,Pix,Profissao,Residencia,DataEmprestimo,Valor,DataVencimento,Status,Obs";var l=S.devedores.map(function(d){return'"'+[d.nome,d.contato||"",d.pix||"",d.profissao||"",d.residencia||"",d.dataEmprestimo||"",d.valor||"",d.dataVencimento||"",d.status,(d.obs||"").replace(/"/g,'""')].join('","')+'"';});dload(new Blob(["\uFEFF"+h+"\n"+l.join("\n")],{type:"text/csv;charset=utf-8;"}),"devedores_"+new Date().toISOString().slice(0,10)+".csv");msg("CSV exportado!");}
@@ -192,9 +192,36 @@ input,select,textarea,button{font-size:16px!important;font-family:inherit}
   function rForm(c){var tit=S.editId?"Editar":"Novo Devedor";var h='<div class="container"><div class="bg-header"><div class="flex items-center gap8"><button class="back-btn" onclick="window.cancel()">'+ICONS.left+'</button><div><h1>'+tit+'</h1><div class="f12 op75">Preencha os dados</div></div></div></div>';h+='<div class="p12" style="margin-top:16px">';var campos=[["Nome *","nome","text","Joao Silva"],["Contato","contato","tel","(82)99999-9999"],["Pix","pix","text","CPF ou e-mail"],["Profissao","profissao","text","Ex: Comerciante"],["Residencia","residencia","text","Rua, numero"],["Data Emprestimo","dataEmprestimo","date",""],["Valor R$","valor","number","0,00"],["Vencimento","dataVencimento","date",""]];campos.forEach(function(c2){h+='<label class="form-label">'+c2[0]+'</label>';h+='<input class="form-input" type="'+c2[2]+'" placeholder="'+c2[3]+'" value="'+esc(S.form[c2[1]]||"")+'" oninput="window.up(\''+c2[1]+'\',this.value)">';});h+='<label class="form-label">Status</label><select class="form-input" onchange="window.up(\'status\',this.value)">';for(var k in STATUS)h+='<option'+(S.form.status===k?' selected':'')+'>'+k+'</option>';h+='</select><label class="form-label">Obs</label>';h+='<textarea class="form-input" placeholder="Anotacoes..." oninput="window.up(\'obs\',this.value)">'+esc(S.form.obs||"")+'</textarea>';h+='<button class="btn btn-primary" onclick="window.sub()">'+ICONS.check+' '+(S.editId?"Salvar":"Cadastrar")+'</button>';h+='<button class="btn btn-secondary" onclick="window.cancel()">Cancelar</button></div></div>';c.innerHTML=h;}
   function rLista(c){var fil=S.devedores.filter(function(d){return(S.filtro==="Todos"||d.status===S.filtro)&&d.nome.toLowerCase().indexOf(S.busca.toLowerCase())!==-1;});var total=S.devedores.filter(function(d){return d.status!=="Pago";}).reduce(function(s,d){return s+pv(d.valor);},0);var cnt={};for(var k in STATUS)cnt[k]=0;S.devedores.forEach(function(d){if(cnt[d.status]!==undefined)cnt[d.status]++;});var h='<div class="container">';h+='<div class="bg-header"><h1>'+ICONS.user+' Controle de Devedores</h1><div class="f12 op75">'+S.devedores.length+' pessoa'+(S.devedores.length!==1?"s":"")+'</div></div>';h+='<div class="bg-card"><div class="f11 op75 bold uppercase ls">Total em aberto</div>';h+='<div class="f28 bold8 ls3">'+total.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})+'</div>';h+='<div class="flex gap8" style="margin-top:10px">';for(var k in cnt)h+='<div class="stat-item"><div class="stat-num">'+cnt[k]+'</div><div class="stat-lbl">'+k+'</div></div>';h+='</div></div>';h+='<div class="flex gap p12-0">';h+='<button class="btn-sm btn-green flex1" onclick="window.expCSV()">'+ICONS.csv+' CSV</button>';h+='<button class="btn-sm btn-indigo flex1" onclick="window.expJSON()">'+ICONS.json+' JSON</button>';h+='<label class="import-label">'+ICONS.importI+' Importar<input type="file" accept=".json,.csv" style="display:none" onchange="window.imp(event)"></label></div>';h+='<div class="filter-row">';var fs=["Todos"].concat(Object.keys(STATUS));fs.forEach(function(f){h+='<button class="filter-btn '+(S.filtro===f?"filter-btn-active":"filter-btn-inactive")+'" onclick="window.setF(\''+f+'\')">'+f+'</button>';});h+='</div><div class="input-group"><span class="gray2">'+ICONS.lupa+'</span>';h+='<input placeholder="Buscar..." value="'+esc(S.busca)+'" oninput="window.setB(this.value)">';if(S.busca)h+='<button style="background:none;border:none;color:#9CA3AF;cursor:pointer;font-size:16px" onclick="window.setB(\'\')">'+ICONS.x+'</button>';h+='</div>';if(!fil.length){h+='<div class="text-center" style="margin-top:48px;color:#9CA3AF"><div class="f40">'+ICONS.user+'</div><div class="f14">'+(S.devedores.length?"Nada encontrado":"Nenhum devedor ainda")+'</div>';if(!S.devedores.length)h+='<div class="f13 gray3">Toque no +</div>';h+='</div>';}else{fil.forEach(function(d){var cfg=STATUS[d.status]||STATUS["Pendente"];h+='<div class="card" onclick="window.det('+d.id+')">';h+='<div style="padding:12px 14px 10px;border-bottom:1px solid #F1F5F9"><div class="flex space-between items-start">';h+='<div class="f15 bold dark">'+esc(d.nome)+'</div>';h+='<span class="badge" style="background:'+cfg.bg+';color:'+cfg.color+'"><span class="badge-dot" style="background:'+cfg.dot+'"></span>'+esc(d.status)+'</span></div>';var m=[d.profissao,d.residencia].filter(Boolean).join(" - ")||"Sem detalhes";h+='<div class="f12 gray" style="margin-top:2px">'+esc(m)+'</div></div>';h+='<div class="flex space-between items-center" style="padding:10px 14px"><div><div class="f11 gray">Valor</div><div class="f16 bold8 blue">'+fmt(d.valor)+'</div></div>';if(d.dataVencimento)h+='<div class="text-right"><div class="f11 gray">Vencimento</div><div class="f13 bold dark2">'+d.dataVencimento+'</div></div>';h+='<span class="gray3 f20">&rsaquo;</span></div></div>';});}h+='<button class="fab" onclick="window.novo()">'+ICONS.plus+'</button></div>';c.innerHTML=h;}
   window.vLista=function(){S.view="lista";render();};window.cancel=function(){S.view="lista";for(var k in EMPTY)S.form[k]=EMPTY[k];S.editId=null;render();};window.novo=function(){for(var k in EMPTY)S.form[k]=EMPTY[k];S.editId=null;S.view="form";render();};window.det=function(id){S.detailId=id;S.view="detail";render();};window.setF=function(f){S.filtro=f;render();};window.setB=function(v){S.busca=v;render();};window.up=function(k,v){S.form[k]=v;};window.sub=submit;window.delById=function(id){del(id);};window.eById=function(id){var d=S.devedores.find(function(x){return x.id===id;});if(d)editar(d);};window.expCSV=expCSV;window.expJSON=expJSON;window.imp=imp;
-  function iniciarApp() {
-    try{var raw=localStorage.getItem(KEY);if(raw)S.devedores=JSON.parse(raw);}catch(e){}
-    render();
+  var GH_USER = "eberalbarrosmoreira-design";
+  var GH_REPO = "DEVEDORES";
+  var GH_TOKEN = "";
+  
+  function carregarDadosCliente(hashSenha) {
+    var url = "https://api.github.com/repos/" + GH_USER + "/" + GH_REPO + "/contents/dados_" + hashSenha + ".json";
+    return fetch(url, {
+      headers: { "Accept": "application/vnd.github.v3+json" }
+    }).then(function(r) {
+      if (r.status === 404) return null;
+      return r.json();
+    }).then(function(data) {
+      if (!data) {
+        S.devedores = [];
+        render();
+        return;
+      }
+      var content = atob(data.content.replace(/\n/g, ""));
+      var parsed = JSON.parse(content);
+      if (parsed.devedores) S.devedores = parsed.devedores;
+      render();
+    }).catch(function(e) {
+      S.devedores = [];
+      render();
+    });
+  }
+    function iniciarApp() {
+    try{var raw=localStorage.getItem(chaveDados());if(raw)S.devedores=JSON.parse(raw);}catch(e){}
+    var hc=AUTH._clienteHash||'';
+    if(hc){carregarDadosCliente(hc);}else{render();}
   }
   telaAuth();
 })();
