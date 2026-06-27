@@ -132,7 +132,7 @@ h2{font-size:16px;color:#94A3B8;margin:20px 0 12px;font-weight:600;text-transfor
     cfg.hashMestre=document.getElementById("iHM").value.trim();
     localStorage.setItem(CONFIG_KEY,JSON.stringify(cfg));
     if(cfg.token&&document.getElementById("aToken"))document.getElementById("aToken").style.display="none";
-    msg("✅ Salvo!");
+    msg("✅ Salvo! Token: "+cfg.token.substring(0,10)+"...");
   }
   
   function msg(t){var e=document.getElementById("toast");if(!e)return;e.textContent=t;e.style.display="block";setTimeout(function(){e.style.display="none"},3000);}
@@ -173,7 +173,7 @@ h2{font-size:16px;color:#94A3B8;margin:20px 0 12px;font-weight:600;text-transfor
   window.pub=function(){
     var btn=document.getElementById("btnPub"),st=document.getElementById("stPub"),er=document.getElementById("erPub");
     st.style.display="none";er.style.display="none";
-    if(!cfg.token){er.textContent="❌ Configure o token na aba Config!";er.style.display="block";return;}
+    if(!cfg.token||cfg.token.length<10){er.textContent="❌ Configure o token na aba Config!";er.style.display="block";return;}
     btn.innerHTML='<span class="spinner"></span> Publicando...';btn.disabled=true;
     var url=API+"/repos/"+cfg.user+"/"+cfg.repo+"/contents/index.html";
     fetch(url,{headers:{"Authorization":"token "+cfg.token,"Accept":"application/vnd.github.v3+json"}})
