@@ -81,16 +81,26 @@ chaveAtivacoes: "dev_ativacoes"
     return finger.substring(50, 90);
   }
   
-  function telaAuth() {
+    function telaAuth() {
     var dId = AUTH._deviceId || gerarIdDispositivo();
     AUTH._deviceId = dId;
     var ativacoes = JSON.parse(localStorage.getItem(AUTH.chaveAtivacoes) || "{}");
-    if (ativacoes[dId]){AUTH._clienteHash=ativacoes[dId];if(AUTH._clienteHash&&AUTH.clientes[AUTH._clienteHash]!==undefined){mostrarCarregando();iniciarApp();return;}else{localStorage.removeItem(AUTH.chaveAtivacoes);}}
+    
+    if (ativacoes[dId] && AUTH._clienteHash && AUTH.clientes[AUTH._clienteHash] !== undefined) {
+      mostrarCarregando();
+      iniciarApp();
+      return;
+    }
+    if (ativacoes[dId] && !AUTH.clientes[ativacoes[dId]]) {
+      localStorage.removeItem(AUTH.chaveAtivacoes);
+    }
+    
+    var msgAviso = ativacoes[dId] ? "Este dispositivo esta vinculado a uma conta. Digite a senha dela." : "Entre com sua senha de acesso";
     
     var app = document.getElementById("app");
     app.innerHTML = '<div class="auth-box"><div class="auth-card">' +
-      '<h2>🔒 Devedores</h2>' +
-      '<p>Entre com sua senha de acesso</p>' +
+      '<h2>👤 Devedores</h2>' +
+      '<p>' + msgAviso + '</p>' +
       '<input class="auth-input" type="password" id="authSenha" placeholder="Senha" autocomplete="off">' +
       '<button class="btn btn-primary" id="authBtn">Entrar</button>' +
       '<div class="ativacao-info" id="authMsg"></div>' +
@@ -112,40 +122,31 @@ chaveAtivacoes: "dev_ativacoes"
         }
         
         var ativos = JSON.parse(localStorage.getItem(AUTH.chaveAtivacoes) || "{}");
+        
+        if (ativos[dId] && ativos[dId] !== hashSenha) {
+          document.getElementById("authMsg").textContent = "Este dispositivo ja esta vinculado a outro cliente! Use a senha correta.";
+          return;
+        }
+        
         var qtdAtiva = 0;
         for (var id in ativos) {
           if (ativos[id] === hashSenha) qtdAtiva++;
         }
-        
-        if (qtdAtiva >= clienteEncontrado) {
-          document.getElementById("authMsg").innerHTML =
-            "Limite de dispositivos atingido!<br>Solicite um codigo de ativacao ao suporte.";
+        if (qtdAtiva >= clienteEncontrado && !ativos[dId]) {
+          document.getElementById("authMsg").innerHTML = "Limite de dispositivos atingido!<br>Solicite um codigo de ativacao ao suporte.";
           telaAtivacao(hashSenha);
           return;
         }
         
-        if(ativos[dId]&&ativos[dId]!==hashSenha){document.getElementById('authMsg').textContent='Este dispositivo ja esta vinculado a outro cliente! Saia primeiro.';return;}
         ativos[dId] = hashSenha;
         localStorage.setItem(AUTH.chaveAtivacoes, JSON.stringify(ativos));
+        AUTH._clienteHash = hashSenha;
         iniciarApp();
       });
     };
   }
   
-  function mostrarCarregando(){
-    var app=document.getElementById("app");
-    if(!app.innerHTML.trim())app.innerHTML='<div class="auth-box"><div class="auth-card"><h2>?? Devedores</h2><p>Carregando...</p></div></div>';
-  }
-  
-    window.sair=function(){
-    if(!confirm("Sair?"))return;
-    localStorage.removeItem(chaveDados());
-    AUTH._clienteHash="";
-    var app=document.getElementById("app");
-    app.innerHTML="";
-    telaAuth();
-  };
-    function telaAtivacao(hashSenha) {
+  function telaAtivacao(hashSenha) {
     var dId = AUTH._deviceId;
     var app = document.getElementById("app");
     
