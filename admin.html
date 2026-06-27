@@ -267,6 +267,35 @@ h2{font-size:16px;color:#94A3B8;margin:20px 0 12px;font-weight:600;text-transfor
     })
     .catch(function(e){er.textContent="? "+e.message;er.style.display="block";})
     .finally(function(){btn.innerHTML="? Publicar Agora";btn.disabled=false;});
+  };    window.editarCli=function(id){
+    var c=null;
+    for(var i=0;i<cli.length;i++){if(cli[i].id===id){c=cli[i];break;}}
+    if(!c)return;
+    var novaSenha=prompt("Nova senha para \""+c.nome+"\":", c.senhaOriginal||"");
+    if(novaSenha===null||novaSenha.trim()==="")return;
+    var novoLimite=prompt("Novo limite de dispositivos para \""+c.nome+"\":", c.limite);
+    if(novoLimite===null||parseInt(novoLimite)<1)return;
+    
+    sha256(novaSenha.trim()).then(function(h){
+      c.senhaOriginal=novaSenha.trim();
+      c.hash=h;
+      c.limite=parseInt(novoLimite);
+      localStorage.setItem(CLIENTES_KEY,JSON.stringify(cli));
+      msg("? Cliente \""+c.nome+"\" atualizado!");
+      render();
+    });
+  };
+  
+  window.renomearCli=function(id){
+    var c=null;
+    for(var i=0;i<cli.length;i++){if(cli[i].id===id){c=cli[i];break;}}
+    if(!c)return;
+    var novoNome=prompt("Novo nome para o cliente:", c.nome);
+    if(novoNome===null||novoNome.trim()==="")return;
+    c.nome=novoNome.trim();
+    localStorage.setItem(CLIENTES_KEY,JSON.stringify(cli));
+    msg("? Cliente renomeado!");
+    render();
   };    login();
 })();
 </script>
