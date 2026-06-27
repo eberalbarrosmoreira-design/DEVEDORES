@@ -85,7 +85,7 @@ chaveAtivacoes: "dev_ativacoes"
     var dId = AUTH._deviceId || gerarIdDispositivo();
     AUTH._deviceId = dId;
     var ativacoes = JSON.parse(localStorage.getItem(AUTH.chaveAtivacoes) || "{}");
-    if (ativacoes[dId]){AUTH._clienteHash=ativacoes[dId];iniciarApp();return;}
+    if (ativacoes[dId]){AUTH._clienteHash=ativacoes[dId];if(AUTH._clienteHash&&AUTH.clientes[AUTH._clienteHash]!==undefined){mostrarCarregando();iniciarApp();return;}else{localStorage.removeItem(AUTH.chaveAtivacoes);}}
     
     var app = document.getElementById("app");
     app.innerHTML = '<div class="auth-box"><div class="auth-card">' +
