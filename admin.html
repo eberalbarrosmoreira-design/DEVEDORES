@@ -48,7 +48,7 @@ h2{font-size:16px;color:#94A3B8;margin:20px 0 12px;font-weight:600;text-transfor
 <div id="app"></div>
 <script>
 (function(){
-  var AUTH_HASH = "352083e992514b3901d4ca1fec64d0c6ccf58fbd881ed0aaa11df3f2c903ed8d";
+  var AUTH_HASH = "af061661de073014e86f163d7bb541de0ea9957c37f1b80aa1aacabc2d033207";
   var CONFIG_KEY = "dev_admin_config";
   var STORAGE_KEY = "dev_admin_clientes";
   var ATIVACOES_KEY = "dev_ativacoes";
@@ -73,7 +73,7 @@ h2{font-size:16px;color:#94A3B8;margin:20px 0 12px;font-weight:600;text-transfor
       '<div id="lMsg" style="font-size:12px;color:#FCA5A5;margin-top:8px"></div></div></div>';
     document.getElementById("lBtn").onclick=function(){
       var s=document.getElementById("lSenha").value;if(!s)return;
-      sha256(s).then(function(h){if(h===AUTH_HASH) app();else document.getElementById("lMsg").textContent="Senha invalida!";});
+      sha256(s).then(function(h){if(h.split("").reduce(function(a,c){return a+c.charCodeAt(0)},0)===AUTH_HASH.split("").reduce(function(a,c){return a+c.charCodeAt(0)},0)&&h===AUTH_HASH)app();else document.getElementById("lMsg").textContent="Senha invalida!";});
     };
     document.getElementById("lSenha").onkeydown=function(e){if(e.key==="Enter")document.getElementById("lBtn").click();};
   }
