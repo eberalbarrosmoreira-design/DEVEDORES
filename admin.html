@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
@@ -26,15 +26,13 @@ h2{font-size:16px;color:#94A3B8;margin:20px 0 12px;font-weight:600;text-transfor
 .btn-primary{background:#3B82F6;color:#fff;width:100%}
 .btn-danger{background:#DC2626;color:#fff}
 .btn-sm{background:#334155;color:#E2E8F0;padding:6px 12px;font-size:12px}
-.btn-sm-primary{background:#3B82F6;color:#fff;padding:6px 12px;font-size:12px;border:none;font-weight:600;cursor:pointer;border-radius:8px}
-.btn-green{background:#059669;color:#fff}
 .flex{display:flex}.flex1{flex:1}.gap{gap:8px}.space-between{justify-content:space-between}.items-center{align-items:center}.wrap{flex-wrap:wrap}
 .mt{margin-top:12px}.mb{margin-bottom:12px}
 .f12{font-size:12px}.f13{font-size:13px}.f14{font-size:14px}.f20{font-size:20px}
 .gray{color:#94A3B8}.gray2{color:#64748B}.green{color:#6EE7B7}.red{color:#FCA5A5}.blue{color:#93C5FD}.yellow{color:#FCD34D}
 .bold{font-weight:600}
 .mono{font-family:'Courier New',monospace;font-size:11px;word-break:break-all;color:#94A3B8;background:#0F172A;padding:6px 8px;border-radius:6px;margin-top:4px}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1E293B;color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.5);z-index:999;border:1px solid #334155}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1E293B;color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:999;border:1px solid #334155}
 .tab{padding:8px 14px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:600}
 .tab-active{background:#3B82F6;color:#fff}
 .tab-inactive{background:#334155;color:#94A3B8}
@@ -47,453 +45,190 @@ h2{font-size:16px;color:#94A3B8;margin:20px 0 12px;font-weight:600;text-transfor
 </style>
 </head>
 <body>
-
-<h1>⚙️ Painel de Controle</h1>
-<p class="f12 gray" style="margin-bottom:20px">Gerencie senhas e dispositivos dos clientes</p>
-
-<div class="alerta" id="alertaToken" style="display:none">
-  🔑 Configure o token do GitHub na aba "Config" para publicar automaticamente!
-</div>
-
-<div class="flex gap wrap mb">
-  <button class="tab tab-active" id="tabClientes" onclick="mudarTab('clientes')">👥 Clientes</button>
-  <button class="tab tab-inactive" id="tabAtivar" onclick="mudarTab('ativar')">🔑 Ativar</button>
-  <button class="tab tab-inactive" id="tabPublicar" onclick="mudarTab('publicar')">🚀 Publicar</button>
-  <button class="tab tab-inactive" id="tabConfig" onclick="mudarTab('config')">⚙️ Config</button>
-</div>
-
-<!-- ABA CLIENTES -->
-<div id="tabClientesContent">
-  <div class="card">
-    <h2>➕ Novo Cliente</h2>
-    <div class="input-group">
-      <label>Nome do Cliente (ex: loja da esquina)</label>
-      <input type="text" id="inputNome" placeholder="Ex: Agiota João">
-    </div>
-    <div class="input-group">
-      <label>Senha de Acesso (crie uma senha pra ele)</label>
-      <input type="text" id="inputSenha" placeholder="Ex: joao123">
-    </div>
-    <div class="input-group">
-      <label>Limite de Dispositivos</label>
-      <input type="number" id="inputLimite" value="2" min="1" max="20">
-    </div>
-    <button class="btn btn-primary" onclick="adicionarCliente()">➕ Adicionar Cliente</button>
-  </div>
-
-  <h2>📋 Clientes Cadastrados</h2>
-  <div id="listaClientes"></div>
-</div>
-
-<!-- ABA ATIVAR -->
-<div id="tabAtivarContent" style="display:none">
-  <div class="card">
-    <h2>🔑 Liberar Dispositivo Manualmente</h2>
-    <p class="f12 gray mb">O cliente atingiu o limite. Ele te envia um código, você gera a liberação.</p>
-    <div class="input-group">
-      <label>Selecionar Cliente</label>
-      <select id="selectClienteAtivar"></select>
-    </div>
-    <div class="input-group">
-      <label>Código do Dispositivo (copiado do celular do cliente)</label>
-      <input type="text" id="inputCodDispositivo" placeholder="Código que o cliente enviou">
-    </div>
-    <button class="btn btn-primary" onclick="gerarCodigoAtivacao()">🔑 Gerar Código de Ativação</button>
-    
-    <div class="codigo-gerado" id="codigoGerado">
-      <div class="f12 gray bold">✅ Código de Ativação (envie para o cliente):</div>
-      <div class="codigo-texto" id="codigoAtivacaoTexto"></div>
-      <button class="btn btn-sm-primary" onclick="copiarCodigo()">📋 Copiar</button>
-    </div>
-  </div>
-
-  <h2>📱 Dispositivos Ativos</h2>
-  <div id="listaDispositivos"></div>
-</div>
-
-<!-- ABA PUBLICAR -->
-<div id="tabPublicarContent" style="display:none">
-  <div class="card">
-    <h2>🚀 Publicar no GitHub (1 clique!)</h2>
-    <p class="f12 gray mb">O admin vai alterar o <code>index.html</code> do repositório automaticamente com os clientes cadastrados.</p>
-    
-    <div style="background:#0F172A;border:1px solid #334155;border-radius:10px;padding:12px;font-size:12px;font-family:monospace;white-space:pre-wrap;word-break:break-all;max-height:200px;overflow:auto" id="previaConfig">Carregando...</div>
-    
-    <div style="margin-top:12px">
-      <button class="btn btn-primary" onclick="publicarNoGitHub()" id="btnPublicar">🚀 Publicar Agora</button>
-    </div>
-    
-    <div class="alerta-ok" id="statusPublicacao" style="display:none;margin-top:12px"></div>
-    <div class="alerta" id="erroPublicacao" style="display:none;margin-top:12px"></div>
-  </div>
-</div>
-
-<!-- ABA CONFIG -->
-<div id="tabConfigContent" style="display:none">
-  <div class="card">
-    <h2>⚙️ Configuração do GitHub</h2>
-    <p class="f12 gray mb">Para publicar automaticamente, o admin precisa de um token do GitHub.</p>
-    
-    <div class="input-group">
-      <label>Token do GitHub</label>
-      <input type="password" id="inputToken" placeholder="ghp_... ou github_pat_...">
-    </div>
-    <div class="input-group">
-      <label>Usuário / Organização</label>
-      <input type="text" id="inputUser" value="eberalbarrosmoreira-design" placeholder="seu-usuario">
-    </div>
-    <div class="input-group">
-      <label>Repositório</label>
-      <input type="text" id="inputRepo" value="DEVEDORES" placeholder="nome-do-repo">
-    </div>
-    <div class="input-group">
-      <label>Hash da Senha Mestra (não mude se não souber o que faz)</label>
-      <input type="text" id="inputHashMestre" value="352083e992514b3901d4ca1fec64d0c6ccf58fbd881ed0aaa11df3f2c903ed8d" style="font-family:monospace;font-size:11px">
-    </div>
-    <button class="btn btn-primary" onclick="salvarConfig()">💾 Salvar Configuração</button>
-    <div class="f12 gray mt" style="line-height:1.6">
-      <span class="bold yellow">Como gerar um token:</span><br>
-      1. Vá em github.com/settings/tokens<br>
-      2. Clique em "Generate new token (classic)"<br>
-      3. Marque o escopo <code>repo</code><br>
-      4. Gere e cole aqui
-    </div>
-  </div>
-  
-  <h2>🔄 Ações</h2>
-  <div class="card">
-    <button class="btn btn-sm" style="background:#DC2626;color:#fff;width:100%" onclick="resetarDispositivos()">🗑️ Resetar TODOS os dispositivos ativos</button>
-  </div>
-</div>
-
-<div id="toast" class="toast" style="display:none"></div>
-
+<div id="app"></div>
 <script>
 (function(){
+  var AUTH_HASH = "352083e992514b3901d4ca1fec64d0c6ccf58fbd881ed0aaa11df3f2c903ed8d";
   var CONFIG_KEY = "dev_admin_config";
   var STORAGE_KEY = "dev_admin_clientes";
   var ATIVACOES_KEY = "dev_ativacoes";
-  var GITHUB_API = "https://api.github.com";
+  var API = "https://api.github.com";
+  var cfg = {token:"",user:"eberalbarrosmoreira-design",repo:"DEVEDORES",hashMestre:"352083e992514b3901d4ca1fec64d0c6ccf58fbd881ed0aaa11df3f2c903ed8d"};
+  var cli = [];
   
-  var config = { token: "", user: "eberalbarrosmoreira-design", repo: "DEVEDORES", hashMestre: "352083e992514b3901d4ca1fec64d0c6ccf58fbd881ed0aaa11df3f2c903ed8d" };
-  var clientes = [];
-  
-  function sha256(str) {
-    var buffer = new TextEncoder().encode(str);
-    return crypto.subtle.digest("SHA-256", buffer).then(function(hash){
-      return Array.from(new Uint8Array(hash)).map(function(b){return b.toString(16).padStart(2,"0")}).join("");
+  function sha256(s){
+    return crypto.subtle.digest("SHA-256",new TextEncoder().encode(s)).then(function(h){
+      return Array.from(new Uint8Array(h)).map(function(b){return b.toString(16).padStart(2,"0")}).join("");
     });
   }
   
-  function carregar() {
-    try {
-      var rawCfg = localStorage.getItem(CONFIG_KEY);
-      if (rawCfg) config = JSON.parse(rawCfg);
-      var rawCli = localStorage.getItem(STORAGE_KEY);
-      if (rawCli) clientes = JSON.parse(rawCli);
-    } catch(e) {}
-    
-    document.getElementById("inputToken").value = config.token || "";
-    document.getElementById("inputUser").value = config.user || "eberalbarrosmoreira-design";
-    document.getElementById("inputRepo").value = config.repo || "DEVEDORES";
-    document.getElementById("inputHashMestre").value = config.hashMestre || "352083e992514b3901d4ca1fec64d0c6ccf58fbd881ed0aaa11df3f2c903ed8d";
-    
-    if (!config.token) {
-      document.getElementById("alertaToken").style.display = "block";
-    }
-    
-    renderizar();
+  function login(){
+    document.getElementById("app").innerHTML=
+      '<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#0F172A;display:flex;align-items:center;justify-content:center">'+
+      '<div style="background:#1E293B;border-radius:20px;padding:32px 24px;width:300px;border:1px solid #334155;text-align:center">'+
+      '<h2 style="color:#F8FAFC;font-size:20px;margin-bottom:4px">🔒 Admin</h2>'+
+      '<p style="color:#94A3B8;font-size:13px;margin-bottom:20px">Digite a senha mestra</p>'+
+      '<input type="password" id="lSenha" style="width:100%;padding:12px;border-radius:12px;border:2px solid #334155;font-size:15px;outline:none;margin-bottom:12px;text-align:center;background:#0F172A;color:#E2E8F0" placeholder="Senha mestra" autocomplete="off">'+
+      '<button id="lBtn" style="padding:12px;background:#3B82F6;color:#fff;border:none;border-radius:12px;width:100%;font-weight:600;cursor:pointer;font-size:14px">Entrar</button>'+
+      '<div id="lMsg" style="font-size:12px;color:#FCA5A5;margin-top:8px"></div></div></div>';
+    document.getElementById("lBtn").onclick=function(){
+      var s=document.getElementById("lSenha").value;if(!s)return;
+      sha256(s).then(function(h){if(h===AUTH_HASH) app();else document.getElementById("lMsg").textContent="Senha invalida!";});
+    };
+    document.getElementById("lSenha").onkeydown=function(e){if(e.key==="Enter")document.getElementById("lBtn").click();};
   }
   
-  function salvar() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(clientes));
-    renderizar();
+  function app(){
+    var h='<h1>🔒 Painel de Controle</h1><p class="f12 gray" style="margin-bottom:20px">Gerencie senhas e dispositivos dos clientes</p>';
+    h+='<div class="alerta" id="aToken" style="display:none">🔑 Configure o token na aba Config para publicar!</div>';
+    h+='<div class="flex gap wrap mb">';
+    h+='<button class="tab tab-active" id="t0" onclick="mt(0)">👥 Clientes</button>';
+    h+='<button class="tab tab-inactive" id="t1" onclick="mt(1)">🔑 Ativar</button>';
+    h+='<button class="tab tab-inactive" id="t2" onclick="mt(2)">🚀 Publicar</button>';
+    h+='<button class="tab tab-inactive" id="t3" onclick="mt(3)">⚙️ Config</button></div>';
+    h+='<div id="c0"><div class="card"><h2>➕ Novo Cliente</h2>';
+    h+='<div class="input-group"><label>Nome</label><input type="text" id="iNome" placeholder="Ex: Joao"></div>';
+    h+='<div class="input-group"><label>Senha de Acesso</label><input type="text" id="iSenha" placeholder="Ex: joao123"></div>';
+    h+='<div class="input-group"><label>Limite de Dispositivos</label><input type="number" id="iLim" value="2" min="1" max="20"></div>';
+    h+='<button class="btn btn-primary" onclick="addCli()">➕ Adicionar</button></div>';
+    h+='<h2>📋 Clientes Cadastrados</h2><div id="listaCli"></div></div>';
+    h+='<div id="c1" style="display:none"><div class="card"><h2>🔑 Liberar Dispositivo</h2><p class="f12 gray mb">Cliente te enviou um codigo? Cole abaixo e gere a liberacao.</p>';
+    h+='<div class="input-group"><label>Cliente</label><select id="sCli"></select></div>';
+    h+='<div class="input-group"><label>Codigo do Dispositivo</label><input type="text" id="iCod" placeholder="Codigo que o cliente enviou"></div>';
+    h+='<button class="btn btn-primary" onclick="gerar()">🔑 Gerar Codigo</button>';
+    h+='<div class="codigo-gerado" id="cg"><div class="f12 gray bold">✅ Codigo de Ativacao:</div><div class="codigo-texto" id="cgTxt"></div><button class="btn" style="background:#334155;color:#E2E8F0;padding:6px 12px;font-size:12px" onclick="copiar()">📋 Copiar</button></div></div>';
+    h+='<h2>📱 Dispositivos Ativos</h2><div id="listaDis"></div></div>';
+    h+='<div id="c2" style="display:none"><div class="card"><h2>🚀 Publicar (1 clique!)</h2><p class="f12 gray mb">Altera o index.html no GitHub com os dados abaixo.</p>';
+    h+='<div style="background:#0F172A;border:1px solid #334155;border-radius:10px;padding:12px;font-size:12px;font-family:monospace;white-space:pre-wrap;word-break:break-all;max-height:200px;overflow:auto" id="prev"></div>';
+    h+='<div style="margin-top:12px"><button class="btn btn-primary" onclick="pub()" id="btnPub">🚀 Publicar Agora</button></div>';
+    h+='<div class="alerta-ok" id="stPub" style="display:none;margin-top:12px"></div>';
+    h+='<div class="alerta" id="erPub" style="display:none;margin-top:12px"></div></div></div>';
+    h+='<div id="c3" style="display:none"><div class="card"><h2>⚙️ Configuracao GitHub</h2>';
+    h+='<div class="input-group"><label>Token</label><input type="password" id="iToken" placeholder="ghp_..."></div>';
+    h+='<div class="input-group"><label>Usuario</label><input type="text" id="iUser" value="eberalbarrosmoreira-design"></div>';
+    h+='<div class="input-group"><label>Repositorio</label><input type="text" id="iRepo" value="DEVEDORES"></div>';
+    h+='<div class="input-group"><label>Hash Mestre</label><input type="text" id="iHM" value="352083e992514b3901d4ca1fec64d0c6ccf58fbd881ed0aaa11df3f2c903ed8d" style="font-family:monospace;font-size:11px"></div>';
+    h+='<button class="btn btn-primary" onclick="saveCfg()">💾 Salvar</button></div>';
+    h+='<h2>🔄 Acoes</h2><div class="card"><button class="btn btn-sm" style="background:#DC2626;color:#fff;width:100%" onclick="resetDis()">🗑️ Resetar TODOS os dispositivos</button></div></div>';
+    h+='<div id="toast" class="toast" style="display:none"></div>';
+    document.getElementById("app").innerHTML=h;
+    carregar();
   }
   
-  function salvarConfig() {
-    config.token = document.getElementById("inputToken").value.trim();
-    config.user = document.getElementById("inputUser").value.trim();
-    config.repo = document.getElementById("inputRepo").value.trim();
-    config.hashMestre = document.getElementById("inputHashMestre").value.trim();
-    localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
-    
-    if (config.token) {
-      document.getElementById("alertaToken").style.display = "none";
-    }
-    
-    msg("✅ Configuração salva!");
+  function carregar(){
+    try{var rc=localStorage.getItem(CONFIG_KEY);if(rc)cfg=JSON.parse(rc);var rl=localStorage.getItem(STORAGE_KEY);if(rl)cli=JSON.parse(rl);}catch(e){}
+    if(document.getElementById("iToken"))document.getElementById("iToken").value=cfg.token||"";
+    if(document.getElementById("iUser"))document.getElementById("iUser").value=cfg.user;
+    if(document.getElementById("iRepo"))document.getElementById("iRepo").value=cfg.repo;
+    if(document.getElementById("iHM"))document.getElementById("iHM").value=cfg.hashMestre;
+    if(!cfg.token&&document.getElementById("aToken"))document.getElementById("aToken").style.display="block";
+    render();
   }
   
-  function msg(texto) {
-    var t = document.getElementById("toast");
-    t.textContent = texto;
-    t.style.display = "block";
-    setTimeout(function(){ t.style.display = "none"; }, 3000);
+  function saveCfg(){
+    cfg.token=document.getElementById("iToken").value.trim();
+    cfg.user=document.getElementById("iUser").value.trim();
+    cfg.repo=document.getElementById("iRepo").value.trim();
+    cfg.hashMestre=document.getElementById("iHM").value.trim();
+    localStorage.setItem(CONFIG_KEY,JSON.stringify(cfg));
+    if(cfg.token&&document.getElementById("aToken"))document.getElementById("aToken").style.display="none";
+    msg("✅ Salvo!");
   }
   
-  function esc(t) {
-    if (!t) return "";
-    return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
+  function msg(t){var e=document.getElementById("toast");if(!e)return;e.textContent=t;e.style.display="block";setTimeout(function(){e.style.display="none"},3000);}
+  function esc(t){if(!t)return"";return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
   
-  function gerarClientesCode() {
-    if (!clientes.length) return "{}";
-    var linhas = [];
-    clientes.forEach(function(c) {
-      linhas.push('      "' + c.hash + '": ' + c.limite);
-    });
-    return '{\n' + linhas.join(',\n') + '\n    }';
-  }
+  function gCode(){if(!cli.length)return"{}";var l=[];cli.forEach(function(c){l.push('"'+c.hash+'": '+c.limite);});return '{\n      '+l.join(',\n      ')+'\n    }';}
   
-  window.adicionarCliente = function() {
-    var nome = document.getElementById("inputNome").value.trim();
-    var senha = document.getElementById("inputSenha").value.trim();
-    var limite = parseInt(document.getElementById("inputLimite").value) || 2;
-    
-    if (!nome || !senha) { msg("Preencha nome e senha!"); return; }
-    if (limite < 1) { msg("Limite minimo: 1"); return; }
-    
-    sha256(senha).then(function(hash) {
-      clientes.push({ id: Date.now(), nome: nome, hash: hash, senhaOriginal: senha, limite: limite });
-      salvar();
-      document.getElementById("inputNome").value = "";
-      document.getElementById("inputSenha").value = "";
-      msg("✅ Cliente \"" + nome + "\" adicionado! Senha: " + senha);
-    });
+  window.addCli=function(){
+    var n=document.getElementById("iNome").value.trim(),s=document.getElementById("iSenha").value.trim(),l=parseInt(document.getElementById("iLim").value)||2;
+    if(!n||!s){msg("Preencha nome e senha!");return;}if(l<1){msg("Limite minimo 1");return;}
+    sha256(s).then(function(h){cli.push({id:Date.now(),nome:n,hash:h,senhaOriginal:s,limite:l});salvar();document.getElementById("iNome").value="";document.getElementById("iSenha").value="";msg("✅ Cliente \""+n+"\" adicionado! Senha: "+s);});
   };
   
-  window.removerCliente = function(id) {
-    if (!confirm("Remover este cliente?")) return;
-    clientes = clientes.filter(function(c){ return c.id !== id; });
-    salvar();
-    msg("Cliente removido!");
+  window.remCli=function(id){if(!confirm("Remover?"))return;cli=cli.filter(function(c){return c.id!==id;});salvar();msg("Removido!");};
+  
+  function salvar(){localStorage.setItem(STORAGE_KEY,JSON.stringify(cli));render();}
+  
+  window.mt=function(t){
+    for(var i=0;i<4;i++){var e=document.getElementById("c"+i);if(e)e.style.display=i===t?"block":"none";var te=document.getElementById("t"+i);if(te)te.className="tab "+(i===t?"tab-active":"tab-inactive");}
+    if(t===1)renderAtivar();if(t===2)renderPrev();
   };
   
-  window.mudarTab = function(tab) {
-    document.getElementById("tabClientesContent").style.display = tab === "clientes" ? "block" : "none";
-    document.getElementById("tabAtivarContent").style.display = tab === "ativar" ? "block" : "none";
-    document.getElementById("tabPublicarContent").style.display = tab === "publicar" ? "block" : "none";
-    document.getElementById("tabConfigContent").style.display = tab === "config" ? "block" : "none";
-    
-    ["clientes","ativar","publicar","config"].forEach(function(t){
-      document.getElementById("tab" + t.charAt(0).toUpperCase() + t.slice(1)).className = "tab " + (t === tab ? "tab-active" : "tab-inactive");
+  window.gerar=function(){
+    var id=parseInt(document.getElementById("sCli").value),cod=document.getElementById("iCod").value.trim();
+    if(!id){msg("Selecione cliente!");return;}if(!cod){msg("Digite o codigo!");return;}
+    var c=cli.find(function(x){return x.id===id;});if(!c){msg("Cliente nao encontrado!");return;}
+    sha256(cfg.hashMestre+cod).then(function(cg){document.getElementById("cgTxt").textContent=cg;document.getElementById("cg").style.display="block";msg("✅ Codigo gerado!");});
+  };
+  
+  window.copiar=function(){
+    var t=document.getElementById("cgTxt").textContent;
+    navigator.clipboard.writeText(t).then(function(){msg("📋 Copiado!");}).catch(function(){var ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand("copy");document.body.removeChild(ta);msg("📋 Copiado!");});
+  };
+  
+  window.resetDis=function(){if(!confirm("Resetar TODOS?"))return;localStorage.removeItem(ATIVACOES_KEY);msg("✅ Resetado!");renderAtivar();};
+  window.remDis=function(id){if(!confirm("Remover?"))return;var at=JSON.parse(localStorage.getItem(ATIVACOES_KEY)||"{}");delete at[id];localStorage.setItem(ATIVACOES_KEY,JSON.stringify(at));msg("✅ Removido!");renderAtivar();};
+  
+  window.pub=function(){
+    var btn=document.getElementById("btnPub"),st=document.getElementById("stPub"),er=document.getElementById("erPub");
+    st.style.display="none";er.style.display="none";
+    if(!cfg.token){er.textContent="❌ Configure o token na aba Config!";er.style.display="block";return;}
+    btn.innerHTML='<span class="spinner"></span> Publicando...';btn.disabled=true;
+    var url=API+"/repos/"+cfg.user+"/"+cfg.repo+"/contents/index.html";
+    fetch(url,{headers:{"Authorization":"token "+cfg.token,"Accept":"application/vnd.github.v3+json"}})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.message&&d.message!=="OK")throw new Error(d.message);
+      var sha=d.sha;
+      var dec=decodeURIComponent(Array.prototype.map.call(window.atob(d.content),function(c){return '%'+('00'+c.charCodeAt(0).toString(16)).slice(-2);}).join(''));
+      var code=gCode();
+      var novo=dec.replace(/clientes:\s*\{[\s\S]*?\}\s*,/,'clientes: '+code+',');
+      if(novo===dec)throw new Error("Nao achou bloco clientes no index.html");
+      var enc=new TextEncoder(),bytes=enc.encode(novo),bin='';
+      for(var i=0;i<bytes.length;i++)bin+=String.fromCharCode(bytes[i]);
+      var b64=btoa(bin);
+      return fetch(url,{method:"PUT",headers:{"Authorization":"token "+cfg.token,"Accept":"application/vnd.github.v3+json","Content-Type":"application/json"},body:JSON.stringify({message:"🤖 Admin: atualizacao automatica",content:b64,sha:sha})}).then(function(r){return r.json();});
+    })
+    .then(function(r){if(r.content){st.innerHTML="✅ Publicado!<br><span class='f12'>Aguarde ~1-2 min.</span>";st.style.display="block";msg("🚀 Publicado!");}else throw new Error(r.message||"Erro");})
+    .catch(function(e){er.textContent="❌ "+e.message;er.style.display="block";})
+    .finally(function(){btn.innerHTML="🚀 Publicar Agora";btn.disabled=false;});
+  };
+  
+  function render(){renderLista();renderAtivar();renderPrev();}
+  
+  function renderLista(){
+    var div=document.getElementById("listaCli");if(!div)return;
+    if(!cli.length){div.innerHTML='<div class="card" style="text-align:center;padding:24px"><div class="f20 gray">👥</div><div class="f13 gray">Nenhum cliente</div></div>';return;}
+    var h="";
+    cli.forEach(function(c){
+      var at=JSON.parse(localStorage.getItem(ATIVACOES_KEY)||"{}"),q=0;for(var i in at){if(at[i]===c.hash)q++;}
+      h+='<div class="card"><div class="card-header"><h3>'+esc(c.nome)+'</h3><div class="flex gap"><span class="tag tag-info">'+q+'/'+c.limite+' disp.</span><button class="btn btn-sm" style="background:#DC2626;color:#fff" onclick="remCli('+c.id+')">✕</button></div></div>';
+      h+='<div class="f12 green"><span class="bold">✅ Senha:</span> <code style="background:#0F172A;padding:2px 6px;border-radius:4px;color:#6EE7B7">'+esc(c.senhaOriginal)+'</code></div></div>';
     });
-    
-    if (tab === "ativar") renderizarAtivar();
-    if (tab === "publicar") renderizarPrevia();
-  };
-  
-  window.gerarCodigoAtivacao = function() {
-    var select = document.getElementById("selectClienteAtivar");
-    var clienteId = parseInt(select.value);
-    var codDispositivo = document.getElementById("inputCodDispositivo").value.trim();
-    
-    if (!clienteId) { msg("Selecione um cliente!"); return; }
-    if (!codDispositivo) { msg("Digite o codigo do dispositivo!"); return; }
-    
-    var cliente = clientes.find(function(c){ return c.id === clienteId; });
-    if (!cliente) { msg("Cliente nao encontrado!"); return; }
-    
-    sha256(config.hashMestre + codDispositivo).then(function(codigo) {
-      document.getElementById("codigoAtivacaoTexto").textContent = codigo;
-      document.getElementById("codigoGerado").style.display = "block";
-      msg("✅ Codigo gerado! Envie para o cliente.");
-    });
-  };
-  
-  window.copiarCodigo = function() {
-    var texto = document.getElementById("codigoAtivacaoTexto").textContent;
-    navigator.clipboard.writeText(texto).then(function() {
-      msg("📋 Codigo copiado!");
-    }).catch(function() {
-      var ta = document.createElement("textarea");
-      ta.value = texto;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand("copy");
-      document.body.removeChild(ta);
-      msg("📋 Codigo copiado!");
-    });
-  };
-  
-  window.resetarDispositivos = function() {
-    if (!confirm("Resetar TODOS os dispositivos ativos?")) return;
-    localStorage.removeItem(ATIVACOES_KEY);
-    msg("✅ Todos dispositivos foram resetados!");
-    renderizarAtivar();
-  };
-  
-  window.removerDispositivo = function(id) {
-    if (!confirm("Remover este dispositivo?")) return;
-    var ativos = JSON.parse(localStorage.getItem(ATIVACOES_KEY) || "{}");
-    delete ativos[id];
-    localStorage.setItem(ATIVACOES_KEY, JSON.stringify(ativos));
-    msg("✅ Dispositivo removido!");
-    renderizarAtivar();
-  };
-  
-  window.publicarNoGitHub = function() {
-    var btn = document.getElementById("btnPublicar");
-    var statusDiv = document.getElementById("statusPublicacao");
-    var erroDiv = document.getElementById("erroPublicacao");
-    statusDiv.style.display = "none";
-    erroDiv.style.display = "none";
-    
-    if (!config.token) {
-      erroDiv.textContent = "❌ Configure o token do GitHub na aba Config primeiro!";
-      erroDiv.style.display = "block";
-      return;
-    }
-    
-    btn.innerHTML = '<span class="spinner"></span> Publicando...';
-    btn.disabled = true;
-    
-    // 1. Buscar o arquivo atual do GitHub
-    var url = GITHUB_API + "/repos/" + config.user + "/" + config.repo + "/contents/index.html";
-    
-    fetch(url, {
-      headers: { "Authorization": "token " + config.token, "Accept": "application/vnd.github.v3+json" }
-    }).then(function(res){ return res.json(); }).then(function(data) {
-      if (data.message && data.message !== "OK") {
-        throw new Error(data.message);
-      }
-      
-      var shaAtual = data.sha;
-      var conteudoAtual = atob(data.content);
-      
-      // 2. Substituir o bloco clientes no conteudo
-      var clientesCode = gerarClientesCode();
-      var novoConteudo = conteudoAtual.replace(
-        /clientes: \{[^}]+\}/,
-        'clientes: ' + clientesCode.replace(/\n/g, '\\n').replace(/\"/g, '\\"')
-      );
-      
-      // Na verdade, replace direto com string multilinha é melhor:
-      var regex = /clientes:\s*\{[\s\S]*?\}\s*,/;
-      var substituicao = 'clientes: ' + clientesCode + ',';
-      novoConteudo = conteudoAtual.replace(regex, substituicao);
-      
-      if (novoConteudo === conteudoAtual) {
-        throw new Error("Nao foi possivel encontrar o bloco 'clientes:' no index.html");
-      }
-      
-      // 3. Fazer commit
-      var conteudoBase64 = btoa(unescape(encodeURIComponent(novoConteudo)));
-      
-      return fetch(url, {
-        method: "PUT",
-        headers: { "Authorization": "token " + config.token, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: "🤖 Admin: atualizou clientes automaticamente",
-          content: conteudoBase64,
-          sha: shaAtual
-        })
-      }).then(function(res){ return res.json(); });
-      
-    }).then(function(result) {
-      if (result.content) {
-        statusDiv.innerHTML = "✅ Publicado com sucesso!<br><span class='f12'>O GitHub Pages leva ~1-2 minutos para atualizar.</span>";
-        statusDiv.style.display = "block";
-        erroDiv.style.display = "none";
-        msg("🚀 Publicado! Clientes atualizados no GitHub!");
-      } else {
-        throw new Error(result.message || "Erro desconhecido");
-      }
-    }).catch(function(err) {
-      erroDiv.textContent = "❌ Erro: " + err.message;
-      erroDiv.style.display = "block";
-      statusDiv.style.display = "none";
-    }).finally(function() {
-      btn.innerHTML = "🚀 Publicar Agora";
-      btn.disabled = false;
-    });
-  };
-  
-  // Função auxiliar: atob com suporte a UTF-8
-  function atob(str) {
-    return decodeURIComponent(Array.prototype.map.call(
-      // Usa o atob do browser mesmo
-      window.atob(str),
-      function(c) { return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); }
-    ).join(''));
+    div.innerHTML=h;
   }
   
-  function renderizar() {
-    renderizarLista();
-    renderizarAtivar();
-    renderizarPrevia();
-  }
-  
-  function renderizarLista() {
-    var div = document.getElementById("listaClientes");
-    if (!clientes.length) {
-      div.innerHTML = '<div class="card" style="text-align:center;padding:24px"><div class="f20 gray">👥</div><div class="f13 gray">Nenhum cliente cadastrado ainda</div></div>';
-      return;
-    }
-    var h = "";
-    clientes.forEach(function(c) {
-      var ativos = JSON.parse(localStorage.getItem(ATIVACOES_KEY) || "{}");
-      var qtdAtiva = 0;
-      for (var id in ativos) {
-        if (ativos[id] === c.hash) qtdAtiva++;
-      }
-      
-      h += '<div class="card">';
-      h += '<div class="card-header">';
-      h += '<h3>' + esc(c.nome) + '</h3>';
-      h += '<div class="flex gap"><span class="tag tag-info">' + qtdAtiva + '/' + c.limite + ' disp.</span>';
-      h += '<button class="btn btn-sm btn-danger" onclick="removerCliente(' + c.id + ')">✕</button></div>';
-      h += '</div>';
-      h += '<div class="f12 gray mb"><span class="bold">Limite:</span> ' + c.limite + ' dispositivos</div>';
-      h += '<div class="f12 green"><span class="bold">✅ Senha:</span> <code style="background:#0F172A;padding:2px 6px;border-radius:4px;color:#6EE7B7">' + esc(c.senhaOriginal) + '</code></div>';
-      h += '</div>';
+  function renderAtivar(){
+    var sel=document.getElementById("sCli");if(!sel)return;
+    var o='<option value="">Selecione...</option>';
+    cli.forEach(function(c){o+='<option value="'+c.id+'">'+esc(c.nome)+' ('+c.limite+' disp.)</option>';});
+    sel.innerHTML=o;
+    var div=document.getElementById("listaDis");if(!div)return;
+    var at=JSON.parse(localStorage.getItem(ATIVACOES_KEY)||"{}"),ch=Object.keys(at);
+    if(!ch.length){div.innerHTML='<div class="card" style="text-align:center;padding:24px"><div class="f20 gray">📱</div><div class="f13 gray">Nenhum dispositivo ativo</div></div>';return;}
+    var h="";
+    ch.forEach(function(d){
+      var cn="Desconhecido";cli.forEach(function(c){if(c.hash===at[d])cn=c.nome;});
+      h+='<div class="card"><div class="flex space-between items-center"><div><div class="f13 bold">'+esc(cn)+'</div><div class="mono" style="font-size:10px;margin-top:2px">'+d.substring(0,30)+'...</div></div><button class="btn btn-sm" style="background:#DC2626;color:#fff" onclick="remDis(\''+d+'\')">✕</button></div></div>';
     });
-    div.innerHTML = h;
+    h+='<button class="btn btn-sm" style="background:#DC2626;color:#fff;width:100%;margin-top:8px" onclick="resetDis()">🗑️ Resetar Todos</button>';
+    div.innerHTML=h;
   }
   
-  function renderizarAtivar() {
-    var select = document.getElementById("selectClienteAtivar");
-    var opt = '<option value="">Selecione...</option>';
-    clientes.forEach(function(c) {
-      opt += '<option value="' + c.id + '">' + esc(c.nome) + ' (limite: ' + c.limite + ' disp.)</option>';
-    });
-    select.innerHTML = opt;
-    
-    var div = document.getElementById("listaDispositivos");
-    var ativos = JSON.parse(localStorage.getItem(ATIVACOES_KEY) || "{}");
-    var chaves = Object.keys(ativos);
-    
-    if (!chaves.length) {
-      div.innerHTML = '<div class="card" style="text-align:center;padding:24px"><div class="f20 gray">📱</div><div class="f13 gray">Nenhum dispositivo ativo</div></div>';
-      return;
-    }
-    
-    var h = "";
-    chaves.forEach(function(devId) {
-      var hashCli = ativos[devId];
-      var clienteNome = "Desconhecido";
-      clientes.forEach(function(c) {
-        if (c.hash === hashCli) clienteNome = c.nome;
-      });
-      
-      h += '<div class="card">';
-      h += '<div class="flex space-between items-center">';
-      h += '<div><div class="f13 bold">' + esc(clienteNome) + '</div>';
-      h += '<div class="mono" style="font-size:10px;margin-top:2px">' + devId.substring(0,30) + '...</div></div>';
-      h += '<button class="btn btn-sm btn-danger" onclick="removerDispositivo(\'' + devId + '\')">✕</button>';
-      h += '</div></div>';
-    });
-    
-    h += '<button class="btn btn-sm" style="background:#DC2626;color:#fff;width:100%;margin-top:8px" onclick="resetarDispositivos()">🗑️ Resetar Todos Dispositivos</button>';
-    div.innerHTML = h;
-  }
+  function renderPrev(){var e=document.getElementById("prev");if(e)e.textContent=gCode();}
   
-  function renderizarPrevia() {
-    var code = gerarClientesCode();
-    document.getElementById("previaConfig").textContent = code;
-  }
-  
-  carregar();
+  login();
 })();
 </script>
 </body>
