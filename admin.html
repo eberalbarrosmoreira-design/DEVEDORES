@@ -97,8 +97,7 @@ h2{font-size:16px;color:#94A3B8;margin:20px 0 12px;font-weight:600;text-transfor
     h+='<div class="input-group"><label>Codigo do Dispositivo</label><input type="text" id="iCod" placeholder="Codigo que o cliente enviou"></div>';
     h+='<button class="btn btn-primary" onclick="gerar()">🔑 Gerar Codigo</button>';
     h+='<div class="codigo-gerado" id="cg"><div class="f12 gray bold">✅ Codigo de Ativacao:</div><div class="codigo-texto" id="cgTxt"></div><button class="btn" style="background:#334155;color:#E2E8F0;padding:6px 12px;font-size:12px" onclick="copiar()">📋 Copiar</button></div></div>';
-    h+='<div class="flex gap" style="margin-bottom:8px"><button class="btn btn-sm" style="background:#3B82F6;color:#fff;flex:1" onclick="sincronizar()">🔄 Sincronizar do GitHub</button></div>
-    <h2>📱 Dispositivos Ativos</h2><div id="listaDis"></div></div>';
+    h+='<h2>📱 Dispositivos Ativos</h2><div id="listaDis"></div></div>';
     h+='<div id="c2" style="display:none"><div class="card"><h2>🚀 Publicar (1 clique!)</h2><p class="f12 gray mb">Altera o index.html no GitHub com os dados abaixo.</p>';
     h+='<div style="background:#0F172A;border:1px solid #334155;border-radius:10px;padding:12px;font-size:12px;font-family:monospace;white-space:pre-wrap;word-break:break-all;max-height:200px;overflow:auto" id="prev"></div>';
     h+='<div style="margin-top:12px"><button class="btn btn-primary" onclick="pub()" id="btnPub">🚀 Publicar Agora</button></div>';
@@ -123,9 +122,7 @@ h2{font-size:16px;color:#94A3B8;margin:20px 0 12px;font-weight:600;text-transfor
     if(document.getElementById("iRepo"))document.getElementById("iRepo").value=cfg.repo;
     if(document.getElementById("iHM"))document.getElementById("iHM").value=cfg.hashMestre;
     if(!cfg.token&&document.getElementById("aToken"))document.getElementById("aToken").style.display="block";
-    if(cfg.token){
-      carregarAtivacoes().then(function(){render();});
-    }else{render();}
+    render();
   }
   
   function saveCfg(){
@@ -208,41 +205,16 @@ h2{font-size:16px;color:#94A3B8;margin:20px 0 12px;font-weight:600;text-transfor
     var id=parseInt(document.getElementById("sCli").value),cod=document.getElementById("iCod").value.trim();
     if(!id){msg("Selecione cliente!");return;}if(!cod){msg("Digite o codigo!");return;}
     var c=cli.find(function(x){return x.id===id;});if(!c){msg("Cliente nao encontrado!");return;}
-    sha256(cfg.hashMestre+cod).then(function(cg){
-      document.getElementById("cgTxt").textContent=cg;
-      document.getElementById("cg").style.display="block";
-      if(cfg.token){
-        carregarAtivacoes().then(function(at){
-          at[cod]=c.hash;
-          salvarAtivacoes(at);
-          localStorage.setItem(ATIVACOES_KEY,JSON.stringify(at));
-          _atCache=at;
-          renderAtivar();
-          renderLista();
-        });
-      }
-      msg("✅ Codigo gerado!");
-    });
+    sha256(cfg.hashMestre+cod).then(function(cg){document.getElementById("cgTxt").textContent=cg;document.getElementById("cg").style.display="block";msg("✅ Codigo gerado!");});
   };
   
   window.copiar=function(){
     var t=document.getElementById("cgTxt").textContent;
     navigator.clipboard.writeText(t).then(function(){msg("📋 Copiado!");}).catch(function(){var ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand("copy");document.body.removeChild(ta);msg("📋 Copiado!");});
   };
-
-  window.sincronizar=function(){
-    if(!cfg.token){msg("❌ Configure o token na aba Config!");return;}
-    msg("U0001F504 Sincronizando...");
-    carregarAtivacoes().then(function(at){
-      localStorage.setItem(ATIVACOES_KEY,JSON.stringify(at));
-      msg("✅ Sincronizado! "+Object.keys(at).length+" dispositivos encontrados.");
-      renderAtivar();
-      renderLista();
-    });
-  };
   
-  window.resetDis=function(){if(!confirm("Resetar TODOS?"))return;localStorage.removeItem(ATIVACOES_KEY);_atCache={};if(cfg.token)salvarAtivacoes({});msg("✅ Resetado!");renderAtivar();};
-  window.remDis=function(id){if(!confirm("Remover?"))return;var at=_atCache?JSON.parse(JSON.stringify(_atCache)):JSON.parse(localStorage.getItem(ATIVACOES_KEY)||"{}");delete at[id];localStorage.setItem(ATIVACOES_KEY,JSON.stringify(at));if(cfg.token)salvarAtivacoes(at);msg("✅ Removido!");renderAtivar();};
+  window.resetDis=function(){if(!confirm("Resetar TODOS?"))return;localStorage.removeItem(ATIVACOES_KEY);msg("✅ Resetado!");renderAtivar();};
+  window.remDis=function(id){if(!confirm("Remover?"))return;var at=JSON.parse(localStorage.getItem(ATIVACOES_KEY)||"{}");delete at[id];localStorage.setItem(ATIVACOES_KEY,JSON.stringify(at));msg("✅ Removido!");renderAtivar();};
   
   window.pub=function(){
     var btn=document.getElementById("btnPub"),st=document.getElementById("stPub"),er=document.getElementById("erPub");
@@ -276,8 +248,7 @@ h2{font-size:16px;color:#94A3B8;margin:20px 0 12px;font-weight:600;text-transfor
     if(!cli.length){div.innerHTML='<div class="card" style="text-align:center;padding:24px"><div class="f20 gray">👥</div><div class="f13 gray">Nenhum cliente</div></div>';return;}
     var h="";
     cli.forEach(function(c){
-      var at=_atCache||JSON.parse(localStorage.getItem(ATIVACOES_KEY)||"{}");
-      var q=0;for(var i in at){if(at[i]===c.hash)q++;}
+      var at=JSON.parse(localStorage.getItem(ATIVACOES_KEY)||"{}"),q=0;for(var i in at){if(at[i]===c.hash)q++;}
       h+='<div class="card"><div class="card-header"><h3>'+esc(c.nome)+'</h3><div class="flex gap"><span class="tag tag-info">'+q+'/'+c.limite+' disp.</span><button class="btn btn-sm" style="background:#DC2626;color:#fff" onclick="remCli('+c.id+')">✕</button></div></div>';
       h+='<div class="f12 green"><span class="bold">✅ Senha:</span> <code style="background:#0F172A;padding:2px 6px;border-radius:4px;color:#6EE7B7">'+esc(c.senhaOriginal)+'</code></div></div>';
     });
@@ -290,7 +261,7 @@ h2{font-size:16px;color:#94A3B8;margin:20px 0 12px;font-weight:600;text-transfor
     cli.forEach(function(c){o+='<option value="'+c.id+'">'+esc(c.nome)+' ('+c.limite+' disp.)</option>';});
     sel.innerHTML=o;
     var div=document.getElementById("listaDis");if(!div)return;
-    var at=_atCache||JSON.parse(localStorage.getItem(ATIVACOES_KEY)||"{}"),ch=Object.keys(at).filter(function(k){return k&&k.length>5;});
+    var at=JSON.parse(localStorage.getItem(ATIVACOES_KEY)||"{}"),ch=Object.keys(at);
     if(!ch.length){div.innerHTML='<div class="card" style="text-align:center;padding:24px"><div class="f20 gray">📱</div><div class="f13 gray">Nenhum dispositivo ativo</div></div>';return;}
     var h="";
     ch.forEach(function(d){
@@ -309,11 +280,11 @@ h2{font-size:16px;color:#94A3B8;margin:20px 0 12px;font-weight:600;text-transfor
     var st=document.getElementById("stPub"),er=document.getElementById("erPub");
     st.style.display="none";er.style.display="none";
     var tokenUsar=cfg.token||document.getElementById("iToken").value.trim();
-    if(!tokenUsar||tokenUsar.length<10){er.textContent="? Token invalido!";er.style.display="block";return;}
+    if(!tokenUsar||tokenUsar.length<10){er.textContent="❌ Token invalido!";er.style.display="block";return;}
     
     var cliEncontrado=null;
     for(var i=0;i<cli.length;i++){if(cli[i].id==cliId){cliEncontrado=cli[i];break;}}
-    if(!cliEncontrado){er.textContent="? Cliente nao encontrado!";er.style.display="block";return;}
+    if(!cliEncontrado){er.textContent="❌ Cliente nao encontrado!";er.style.display="block";return;}
     
     btn.innerHTML='<span class="spinner"></span> Publicando dados do cliente...';btn.disabled=true;
     
@@ -356,7 +327,7 @@ h2{font-size:16px;color:#94A3B8;margin:20px 0 12px;font-weight:600;text-transfor
       c.hash=h;
       c.limite=parseInt(novoLimite);
       localStorage.setItem(STORAGE_KEY,JSON.stringify(cli));
-      msg("? Cliente \""+c.nome+"\" atualizado!");
+      msg("✅ Cliente \""+c.nome+"\" atualizado!");
       render();
     });
   };
@@ -369,7 +340,7 @@ h2{font-size:16px;color:#94A3B8;margin:20px 0 12px;font-weight:600;text-transfor
     if(novoNome===null||novoNome.trim()==="")return;
     c.nome=novoNome.trim();
     localStorage.setItem(STORAGE_KEY,JSON.stringify(cli));
-    msg("? Cliente renomeado!");
+    msg("✅ Cliente renomeado!");
     render();
   };    login();
 })();
