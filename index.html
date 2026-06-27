@@ -137,11 +137,13 @@ chaveAtivacoes: "dev_ativacoes"
     if(!app.innerHTML.trim())app.innerHTML='<div class="auth-box"><div class="auth-card"><h2>?? Devedores</h2><p>Carregando...</p></div></div>';
   }
   
-  window.sair=function(){
+    window.sair=function(){
     if(!confirm("Sair?"))return;
     localStorage.removeItem(chaveDados());
     AUTH._clienteHash="";
-    location.reload();
+    var app=document.getElementById("app");
+    app.innerHTML="";
+    telaAuth();
   };
     function telaAtivacao(hashSenha) {
     var dId = AUTH._deviceId;
