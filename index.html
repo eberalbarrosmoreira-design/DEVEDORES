@@ -208,6 +208,9 @@ chaveAtivacoes: "dev_ativacoes"
   var GH_TOKEN = "";
   
   function carregarDadosCliente(hashSenha) {
+    var localRaw = localStorage.getItem(chaveDados());
+    var localDados = localRaw ? JSON.parse(localRaw) : null;
+    
     var url = "https://api.github.com/repos/" + GH_USER + "/" + GH_REPO + "/contents/dados_" + hashSenha + ".json";
     return fetch(url, {
       headers: { "Accept": "application/vnd.github.v3+json" }
@@ -215,17 +218,23 @@ chaveAtivacoes: "dev_ativacoes"
       if (r.status === 404) return null;
       return r.json();
     }).then(function(data) {
-      if (!data) {
-        S.devedores = [];
-        render();
-        return;
+      if (data) {
+        var content = atob(data.content.replace(/\n/g, ""));
+        var parsed = JSON.parse(content);
+        if (parsed.devedores && parsed.devedores.length > 0) {
+          S.devedores = parsed.devedores;
+          localStorage.setItem(chaveDados(), JSON.stringify(parsed.devedores));
+        } else if (localDados && localDados.length > 0) {
+          S.devedores = localDados;
+        }
+      } else if (localDados && localDados.length > 0) {
+        S.devedores = localDados;
       }
-      var content = atob(data.content.replace(/\n/g, ""));
-      var parsed = JSON.parse(content);
-      if (parsed.devedores) S.devedores = parsed.devedores;
       render();
     }).catch(function(e) {
-      S.devedores = [];
+      if (localDados && localDados.length > 0) {
+        S.devedores = localDados;
+      }
       render();
     });
   }
