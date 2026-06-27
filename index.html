@@ -138,11 +138,9 @@ chaveAtivacoes: "dev_ativacoes"
   }
   
   window.sair=function(){
-    if(!confirm("Sair? Voce precisara fazer login novamente."))return;
-    localStorage.removeItem(AUTH.chaveAtivacoes);
+    if(!confirm("Sair?"))return;
     localStorage.removeItem(chaveDados());
     AUTH._clienteHash="";
-    AUTH._deviceId=null;
     location.reload();
   };
     function telaAtivacao(hashSenha) {
