@@ -92,7 +92,7 @@ input,select,textarea,button{font-size:16px!important;font-family:inherit}
     var dId = AUTH._deviceId || gerarIdDispositivo();
     AUTH._deviceId = dId;
     var ativacoes = JSON.parse(localStorage.getItem(AUTH.chaveAtivacoes) || "{}");
-    if (ativacoes[dId]) { iniciarApp(); return; }
+    if (ativacoes[dId]){AUTH._clienteHash=ativacoes[dId];iniciarApp();return;}
     
     var app = document.getElementById("app");
     app.innerHTML = '<div class="auth-box"><div class="auth-card">' +
