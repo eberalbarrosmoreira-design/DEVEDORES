@@ -138,7 +138,7 @@ h2{font-size:16px;color:#94A3B8;margin:20px 0 12px;font-weight:600;text-transfor
   function msg(t){var e=document.getElementById("toast");if(!e)return;e.textContent=t;e.style.display="block";setTimeout(function(){e.style.display="none"},3000);}
   function esc(t){if(!t)return"";return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
   
-  function gCode(){if(!cli.length)return"{}";var l=[];cli.forEach(function(c){l.push('"'+c.hash+'": '+c.limite);});return '{\n      '+l.join(',\n      ')+'\n    }';}
+  function gCode(){if(!cli.length)return"{}";var o="{";cli.forEach(function(c,i){if(i>0)o+=",";o+='"'+c.hash+'":'+c.limite;});return o+"}";}
   
   window.addCli=function(){
     var n=document.getElementById("iNome").value.trim(),s=document.getElementById("iSenha").value.trim(),l=parseInt(document.getElementById("iLim").value)||2;
@@ -183,7 +183,7 @@ h2{font-size:16px;color:#94A3B8;margin:20px 0 12px;font-weight:600;text-transfor
       var sha=d.sha;
       var dec=decodeURIComponent(Array.prototype.map.call(window.atob(d.content),function(c){return '%'+('00'+c.charCodeAt(0).toString(16)).slice(-2);}).join(''));
       var code=gCode();
-      var novo=dec.replace(/clientes:\s*\{[\s\S]*?\}\s*,/,'clientes: '+code+',');
+      var novo=dec.replace(/clientes:\s*\{[^}]*\},/,'clientes: '+code+',');
       if(novo===dec)throw new Error("Nao achou bloco clientes no index.html");
       var enc=new TextEncoder(),bytes=enc.encode(novo),bin='';
       for(var i=0;i<bytes.length;i++)bin+=String.fromCharCode(bytes[i]);
