@@ -124,6 +124,7 @@ chaveAtivacoes: "dev_ativacoes"
           return;
         }
         
+        if(ativos[dId]&&ativos[dId]!==hashSenha){document.getElementById('authMsg').textContent='Este dispositivo ja esta vinculado a outro cliente! Saia primeiro.';return;}
         ativos[dId] = hashSenha;
         localStorage.setItem(AUTH.chaveAtivacoes, JSON.stringify(ativos));
         iniciarApp();
