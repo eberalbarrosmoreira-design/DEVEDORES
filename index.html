@@ -1,238 +1,290 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#1E3A5F">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Devedores">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="theme-color" content="#0F172A" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Devedores" />
 <title>Controle de Devedores - Pro</title>
 <style>
-
-
-
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#F1F5F9;color:#111;font-size:14px;overflow:hidden}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#F8FAFC;overscroll-behavior:none;color:#0F172A;font-size:14px}
 input,select,textarea,button{font-size:16px!important;font-family:inherit}
-.auth-box{position:fixed;top:0;left:0;width:100%;height:100%;background:#F1F5F9;display:flex;align-items:center;justify-content:center;z-index:9999}
-.auth-card{background:#fff;border-radius:20px;padding:32px 24px 24px;width:320px;box-shadow:0 8px 32px rgba(0,0,0,.12);text-align:center}
-.auth-card h2{color:#1E3A5F;font-size:20px;margin-bottom:4px}
-.auth-card p{color:#6B7280;font-size:13px;margin-bottom:20px}
-.auth-input{width:100%;padding:12px 14px;border-radius:12px;border:2px solid #E2E8F0;font-size:15px;outline:none;margin-bottom:12px;text-align:center;letter-spacing:2px}
-.auth-input:focus{border-color:#2563EB}
-.btn{padding:13px;border:none;font-weight:600;cursor:pointer;width:100%;margin-bottom:10px;border-radius:12px;font-size:14px}
-.btn-primary{background:linear-gradient(135deg,#1E3A5F,#2563EB);color:#fff;font-size:15px;font-weight:700;padding:14px}
-.btn-secondary{background:#E2E8F0;color:#475569}
-.ativacao-info{font-size:11px;color:#9CA3AF;margin-top:8px}
-.spinner{display:inline-block;width:24px;height:24px;border:3px solid #E2E8F0;border-top-color:#2563EB;border-radius:50%;animation:spin .6s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
+::-webkit-scrollbar{width:0;height:0}
 
+/* ── HEADER ── */
+.bg-header{background:linear-gradient(135deg,#0F172A,#1E293B);color:#fff;padding:20px 20px 16px;position:sticky;top:0;z-index:10}
+.bg-header h1{font-size:20px;font-weight:800;letter-spacing:-.02em}
+.bg-header .sub{font-size:12px;opacity:.6;margin-top:2px}
 
+/* ── TOTAL CARD ── */
+.bg-card{background:linear-gradient(135deg,#0F172A,#1E3A5F);color:#fff;border-radius:16px;padding:18px 20px;margin:16px 16px 0;box-shadow:0 8px 24px rgba(15,23,42,.15);position:relative;overflow:hidden}
+.bg-card::before{content:'';position:absolute;top:-50%;right:-30%;width:200px;height:200px;background:rgba(255,255,255,.03);border-radius:50%}
+.bg-card .total-label{font-size:11px;opacity:.6;font-weight:600;text-transform:uppercase;letter-spacing:.08em}
+.bg-card .total-val{font-size:30px;font-weight:800;margin-top:4px;letter-spacing:-.03em;position:relative;z-index:1}
+.stat-row{display:flex;gap:8px;margin-top:14px;position:relative;z-index:1}
+.stat-item{flex:1;background:rgba(255,255,255,.08);border-radius:10px;padding:8px 8px;text-align:center;backdrop-filter:blur(4px)}
+.stat-num{font-size:16px;font-weight:700}
+.stat-lbl{font-size:9px;opacity:.65;margin-top:1px}
 
+/* ── CARDS ── */
+.card{background:#fff;border-radius:14px;margin:10px 16px 0;box-shadow:0 1px 3px rgba(0,0,0,.04),0 4px 12px rgba(0,0,0,.04);overflow:hidden;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.card:active{transform:scale(.98);box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.card2{background:#fff;border-radius:14px;margin:12px 16px;padding:18px 20px;box-shadow:0 1px 3px rgba(0,0,0,.04),0 4px 12px rgba(0,0,0,.04)}
+.container{max-width:480px;margin:0 auto;min-height:100vh;padding-bottom:80px;position:relative}
+
+/* ── UTILS ── */
+.flex{display:flex}.flex1{flex:1}.gap{gap:8px}.gap12{gap:12px}.gap4{gap:4px}
+.space-between{justify-content:space-between}.items-center{align-items:center}.items-start{align-items:flex-start}
+.p12{padding:12px 16px}.p16{padding:16px 20px}.p0-16{padding:0 16px}.text-center{text-align:center}.text-right{text-align:right}
+.f11{font-size:11px}.f12{font-size:12px}.f13{font-size:13px}.f14{font-size:14px}.f15{font-size:15px}.f16{font-size:16px}.f18{font-size:18px}.f20{font-size:20px}.f22{font-size:22px}.f30{font-size:30px}.f40{font-size:36px}
+.bold{font-weight:600}.bold7{font-weight:700}.bold8{font-weight:800}
+.op60{opacity:.6}.op75{opacity:.75}
+.gray{color:#64748B}.gray2{color:#94A3B8}.gray3{color:#CBD5E1}.dark{color:#0F172A}.dark2{color:#334155}.blue{color:#1E3A5F}
+.uppercase{text-transform:uppercase}.ls{letter-spacing:.06em}.ls2{letter-spacing:-.02em}.ls3{letter-spacing:-.03em}
+.mt8{margin-top:8px}.mt16{margin-top:16px}.mb8{margin-bottom:8px}.mb16{margin-bottom:16px}
+
+/* ── BUTTONS ── */
+.btn{display:block;width:100%;padding:14px;border:none;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;margin-bottom:10px;transition:opacity .15s,transform .15s}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:linear-gradient(135deg,#0F172A,#1E3A5F);color:#fff}
+.btn-danger{background:#FEF2F2;color:#991B1B}.btn-secondary{background:#F1F5F9;color:#475569}
+.btn-sm{padding:10px 14px;font-size:12px;margin-bottom:0;border-radius:10px;font-weight:600;border:none;cursor:pointer;transition:opacity .15s}
+.btn-sm:active{opacity:.7}
+.btn-green{background:#DCFCE7;color:#166534}.btn-indigo{background:#EEF2FF;color:#3730A3}
+
+/* ── EXPORT / IMPORT ── */
+.export-row{display:flex;gap:8px;padding:12px 16px 0}
+.export-row button,.export-row label{flex:1;padding:10px;border-radius:10px;border:none;font-size:12px;font-weight:600;cursor:pointer;text-align:center;display:flex;align-items:center;justify-content:center;transition:opacity .15s}
+.export-row button:active,.export-row label:active{opacity:.7}
+
+/* ── FILTER ── */
+.filter-row{display:flex;gap:6px;padding:12px 16px 0;overflow-x:auto;scrollbar-width:none}
+.filter-btn{padding:7px 16px;border-radius:20px;border:none;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap;transition:all .15s}
+.filter-btn-active{background:#0F172A;color:#fff}
+.filter-btn-inactive{background:#F1F5F9;color:#64748B}
+.filter-btn-inactive:active{background:#E2E8F0}
+
+/* ── SEARCH BOX ── */
+.search-wrap{background:#fff;border:1.5px solid #E2E8F0;border-radius:12px;display:flex;align-items:center;padding:0 14px;gap:8px;margin:10px 16px 0;transition:border-color .15s}
+.search-wrap:focus-within{border-color:#1E3A5F}
+.search-wrap input{flex:1;border:none;outline:none;padding:11px 0;font-size:14px;background:transparent;color:#0F172A}
+.search-wrap input::placeholder{color:#94A3B8}
+
+/* ── FORM ── */
+.form-input{width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid #E2E8F0;font-size:14px;outline:none;background:#fff;margin-bottom:16px;color:#0F172A;transition:border-color .15s}
+.form-input:focus{border-color:#1E3A5F}
+.form-select{width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid #E2E8F0;font-size:14px;outline:none;background:#fff;margin-bottom:16px;color:#0F172A;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394A3B8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.form-label{font-size:11px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;display:block}
+.form-group{margin-bottom:4px}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700;white-space:nowrap}
+.badge-dot{width:6px;height:6px;border-radius:50%;display:inline-block}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#0F172A;color:#fff;padding:12px 24px;border-radius:12px;font-size:13px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:999;animation:toastIn .2s ease}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* ── FAB ── */
+.fab{position:fixed;bottom:24px;right:20px;width:56px;height:56px;border-radius:28px;background:linear-gradient(135deg,#0F172A,#1E3A5F);color:#fff;border:none;font-size:30px;cursor:pointer;box-shadow:0 6px 20px rgba(15,23,42,.35);display:flex;align-items:center;justify-content:center;z-index:100;transition:transform .15s}
+.fab:active{transform:scale(.92)}
+.back-btn{background:none;border:none;color:#fff;font-size:24px;cursor:pointer;padding:0 8px 0 0;transition:opacity .15s}.back-btn:active{opacity:.5}
+
+/* ── AUTH ── */
+.auth-box{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#F8FAFC,#E2E8F0);display:flex;align-items:center;justify-content:center;z-index:9999}
+.auth-card{background:#fff;border-radius:24px;padding:36px 28px 28px;width:340px;box-shadow:0 16px 48px rgba(0,0,0,.08);text-align:center}
+.auth-card h2{color:#0F172A;font-size:22px;margin-bottom:4px;font-weight:800;letter-spacing:-.02em}
+.auth-card p{color:#64748B;font-size:13px;margin-bottom:24px}
+.auth-input{width:100%;padding:13px 16px;border-radius:14px;border:2px solid #E2E8F0;font-size:16px;outline:none;margin-bottom:14px;text-align:center;letter-spacing:3px;transition:border-color .15s}
+.auth-input:focus{border-color:#0F172A}
+.ativacao-info{font-size:11px;color:#94A3B8;margin-top:10px;line-height:1.5}
 </style>
-</head>
-<body>
+</head><body>
 <div id="app"></div>
 <script>
 (function(){
   var AUTH = {
     hashMestre: "af061661de073014e86f163d7bb541de0ea9957c37f1b80aa1aacabc2d033207",
-    clientes: {},
-    chaveAtivacoes: "dev_ativacoes"
+    clientes: {"46070d4bf934fb0d4b06d9e2c46e346944e322444900a435d7d9a95e6d7435f5":2,"6ca13d52ca70c883e0f0bb101e425a89e8624de51db2d2392593af6a84118090":1},
+chaveAtivacoes: "dev_ativacoes"
   };
-
+  
   function sha256(str) {
-    return crypto.subtle.digest("SHA-256",new TextEncoder().encode(str)).then(function(h){
-      return Array.from(new Uint8Array(h)).map(function(b){return b.toString(16).padStart(2,"0")}).join("");
+    var buffer = new TextEncoder().encode(str);
+    return crypto.subtle.digest("SHA-256", buffer).then(function(hash){
+      return Array.from(new Uint8Array(hash)).map(function(b){return b.toString(16).padStart(2,"0")}).join("");
     });
   }
-
+  
   function gerarIdDispositivo() {
-    var c=document.createElement("canvas");c.width=200;c.height=50;
-    var ctx=c.getContext("2d");ctx.textBaseline="top";ctx.font="14px Arial";
-    ctx.fillText(navigator.userAgent,2,2);
-    ctx.fillText(navigator.language,2,20);
-    ctx.fillText(screen.width+"x"+screen.height,2,36);
-    return c.toDataURL().replace(/^data:image\/png;base64,/,"").substring(50,90);
+    var canvas = document.createElement("canvas");
+    canvas.width = 200; canvas.height = 50;
+    var ctx = canvas.getContext("2d");
+    ctx.textBaseline = "top";
+    ctx.font = "14px Arial";
+    ctx.fillText(navigator.userAgent, 2, 2);
+    ctx.fillText(navigator.language, 2, 20);
+    ctx.fillText(screen.width+"x"+screen.height, 2, 36);
+    var finger = canvas.toDataURL().replace(/^data:image\/png;base64,/, "");
+    return finger.substring(50, 90);
   }
-
+  
   function telaAuth() {
     var dId = AUTH._deviceId || gerarIdDispositivo();
     AUTH._deviceId = dId;
     var ativacoes = JSON.parse(localStorage.getItem(AUTH.chaveAtivacoes) || "{}");
-    if (ativacoes[dId] && AUTH.clientes[ativacoes[dId]] !== undefined) {
-      AUTH._clienteHash = ativacoes[dId];
-      iniciarApp();
-      return;
-    }
-    if (ativacoes[dId] && !AUTH.clientes[ativacoes[dId]]) {
-      localStorage.removeItem(AUTH.chaveAtivacoes);
-      ativacoes = {};
-    }
-    var msgAviso = ativacoes[dId] ? "Este dispositivo esta vinculado a uma conta. Digite a senha dela." : "Entre com sua senha de acesso";
+    if (ativacoes[dId]){AUTH._clienteHash=ativacoes[dId];if(AUTH._clienteHash&&AUTH.clientes[AUTH._clienteHash]!==undefined){mostrarCarregando();iniciarApp();return;}else{localStorage.removeItem(AUTH.chaveAtivacoes);}}
+    
     var app = document.getElementById("app");
-    app.innerHTML =
-      '<div class="auth-box"><div class="auth-card">' +
+    app.innerHTML = '<div class="auth-box"><div class="auth-card">' +
       '<h2>🔒 Devedores</h2>' +
-      '<p>' + msgAviso + '</p>' +
+      '<p>Entre com sua senha de acesso</p>' +
       '<input class="auth-input" type="password" id="authSenha" placeholder="Senha" autocomplete="off">' +
       '<button class="btn btn-primary" id="authBtn">Entrar</button>' +
       '<div class="ativacao-info" id="authMsg"></div>' +
       '</div></div>';
-    document.getElementById("authBtn").onclick = function(){
+    
+    document.getElementById("authBtn").onclick = function() {
       var senha = document.getElementById("authSenha").value;
       if (!senha) return;
-      sha256(senha).then(function(hashSenha){
+      
+      sha256(senha).then(function(hashSenha) {
         var clienteEncontrado = null;
         for (var h in AUTH.clientes) {
           if (h === hashSenha) { clienteEncontrado = AUTH.clientes[h]; break; }
         }
+        
         if (!clienteEncontrado) {
           document.getElementById("authMsg").textContent = "Senha invalida!";
           return;
         }
+        
         var ativos = JSON.parse(localStorage.getItem(AUTH.chaveAtivacoes) || "{}");
-        if (ativos[dId] && ativos[dId] !== hashSenha) {
-          document.getElementById("authMsg").textContent = "Este dispositivo ja esta vinculado a outro cliente! Use a senha correta.";
-          return;
-        }
         var qtdAtiva = 0;
-        for (var id in ativos) { if (ativos[id] === hashSenha) qtdAtiva++; }
-        if (qtdAtiva >= clienteEncontrado && !ativos[dId]) {
-          document.getElementById("authMsg").innerHTML = "Limite de dispositivos atingido!<br>Solicite um codigo de ativacao ao suporte.";
+        for (var id in ativos) {
+          if (ativos[id] === hashSenha) qtdAtiva++;
+        }
+        
+        if (qtdAtiva >= clienteEncontrado) {
+          document.getElementById("authMsg").innerHTML =
+            "Limite de dispositivos atingido!<br>Solicite um codigo de ativacao ao suporte.";
           telaAtivacao(hashSenha);
           return;
         }
+        
         ativos[dId] = hashSenha;
         localStorage.setItem(AUTH.chaveAtivacoes, JSON.stringify(ativos));
-        AUTH._clienteHash = hashSenha;
         iniciarApp();
       });
     };
-    document.getElementById("authSenha").onkeydown = function(e){
-      if (e.key === "Enter") document.getElementById("authBtn").click();
-    };
   }
-
-  function telaAtivacao(hashSenha) {
+  
+  function mostrarCarregando(){
+    var app=document.getElementById("app");
+    if(!app.innerHTML.trim())app.innerHTML='<div class="auth-box"><div class="auth-card"><h2>📋 Devedores</h2><p>Carregando...</p></div></div>';
+  }
+  
+  window.sair=function(){
+    if(!confirm("Sair? Voce precisara fazer login novamente."))return;
+    localStorage.removeItem(AUTH.chaveAtivacoes);
+    localStorage.removeItem(chaveDados());
+    AUTH._clienteHash="";
+    AUTH._deviceId=null;
+    location.reload();
+  };
+    function telaAtivacao(hashSenha) {
     var dId = AUTH._deviceId;
     var app = document.getElementById("app");
-    app.innerHTML =
-      '<div class="auth-box"><div class="auth-card">' +
-      '<h2>🔒 Ativacao</h2>' +
+    
+    app.innerHTML = '<div class="auth-box"><div class="auth-card">' +
+      '<h2>🔐 Ativacao</h2>' +
       '<p>Envie este codigo ao suporte:</p>' +
       '<div style="background:#F1F5F9;border-radius:10px;padding:12px;font-size:11px;word-break:break-all;margin-bottom:12px;font-family:monospace" id="codDispositivo">Carregando...</div>' +
       '<p style="font-size:13px;margin-bottom:12px">Digite o codigo recebido:</p>' +
       '<input class="auth-input" type="text" id="codAtivacao" placeholder="Codigo de ativacao" autocomplete="off">' +
       '<button class="btn btn-primary" id="ativarBtn">Ativar</button>' +
       '<button class="btn btn-secondary" onclick="location.reload()">Voltar</button>' +
-      '<div class="ativacao-info" id="authMsg2"></div>' +
+      '<div class="ativacao-info" id="authMsg"></div>' +
       '</div></div>';
-    sha256(hashSenha + dId).then(function(codDispositivo){
-      document.getElementById("codDispositivo").textContent = codDispositivo;
+    
+    sha256(hashSenha + dId).then(function(codDispositivo) {
+      document.getElementById("codDispositivo").textContent = codDispositivo.substring(0, 20) + "...";
       AUTH._codDispositivo = codDispositivo;
     });
-    document.getElementById("ativarBtn").onclick = function(){
+    
+    document.getElementById("ativarBtn").onclick = function() {
       var codigo = document.getElementById("codAtivacao").value.trim();
       if (!codigo) return;
-      sha256(AUTH.hashMestre + AUTH._codDispositivo).then(function(esperado){
+      
+      sha256(AUTH.hashMestre + AUTH._codDispositivo).then(function(esperado) {
         if (codigo === esperado) {
           var ativos = JSON.parse(localStorage.getItem(AUTH.chaveAtivacoes) || "{}");
           ativos[AUTH._deviceId] = hashSenha;
           localStorage.setItem(AUTH.chaveAtivacoes, JSON.stringify(ativos));
-          AUTH._clienteHash = hashSenha;
           iniciarApp();
         } else {
-          document.getElementById("authMsg2").textContent = "Codigo invalido!";
+          document.getElementById("authMsg").textContent = "Codigo invalido!";
         }
       });
     };
   }
-
-  function iniciarApp() {
-    var app = document.getElementById("app");
-    var hash = AUTH._clienteHash;
-    var nome = "Cliente";
-    for (var h in AUTH.clientes) {
-      if (h === hash) { nome = AUTH.clientes[h]; break; }
-    }
-    app.innerHTML =
-      '<div style="padding:20px;max-width:600px;margin:0 auto">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">' +
-      '<h1 style="font-size:22px;color:#1E3A5F">🔒 Devedores</h1>' +
-      '<span style="font-size:12px;color:#6B7280">' + nome + '</span>' +
-      '</div>' +
-      '<div id="listaDevedores" style="margin-bottom:16px"></div>' +
-      '<div class="card" style="margin-bottom:16px">' +
-      '<h2 style="font-size:14px;color:#6B7280;margin-bottom:8px;text-transform:uppercase">Novo Devedor</h2>' +
-      '<div class="input-group"><label>Nome</label><input type="text" id="iNomeDev" placeholder="Nome do devedor"></div>' +
-      '<div class="input-group"><label>Valor</label><input type="text" id="iValorDev" placeholder="Ex: 150.00"></div>' +
-      '<button class="btn btn-primary" onclick="addDev()">Adicionar</button>' +
-      '</div>' +
-      '<div id="dispositivoInfo" class="card" style="font-size:11px;color:#9CA3AF;text-align:center">Dispositivo ID: ' + AUTH._deviceId.substring(0,15) + '...</div>' +
-      '</div>';
-    renderDevedores();
-  }
-
-  window.addDev = function() {
-    var nome = document.getElementById("iNomeDev").value.trim();
-    var valor = document.getElementById("iValorDev").value.trim();
-    if (!nome || !valor) { alert("Preencha nome e valor!"); return; }
-    var devedores = JSON.parse(localStorage.getItem("dev_devedores_" + AUTH._clienteHash) || "[]");
-    devedores.push({id:Date.now(), nome: nome, valor: valor, data: new Date().toISOString().split("T")[0]});
-    localStorage.setItem("dev_devedores_" + AUTH._clienteHash, JSON.stringify(devedores));
-    document.getElementById("iNomeDev").value = "";
-    document.getElementById("iValorDev").value = "";
-    renderDevedores();
-  };
-
-  window.remDev = function(id) {
-    if (!confirm("Remover devedor?")) return;
-    var devedores = JSON.parse(localStorage.getItem("dev_devedores_" + AUTH._clienteHash) || "[]");
-    devedores = devedores.filter(function(d) { return d.id !== id; });
-    localStorage.setItem("dev_devedores_" + AUTH._clienteHash, JSON.stringify(devedores));
-    renderDevedores();
-  };
-
-  window.exportarCSV = function() {
-    var devedores = JSON.parse(localStorage.getItem("dev_devedores_" + AUTH._clienteHash) || "[]");
-    if (!devedores.length) { alert("Nenhum devedor para exportar!"); return; }
-    var csv = "Nome,Valor,Data" + String.fromCharCode(10);
-    devedores.forEach(function(d) { csv += '"' + d.nome + '","' + d.valor + '","' + d.data + '"' + String.fromCharCode(10); });
-    var blob = new Blob([csv], {type: "text/csv;charset=utf-8"});
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement("a"); a.href = url; a.download = "devedores.csv"; a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  function renderDevedores() {
-    var div = document.getElementById("listaDevedores");
-    if (!div) return;
-    var devedores = JSON.parse(localStorage.getItem("dev_devedores_" + AUTH._clienteHash) || "[]");
-    if (!devedores.length) {
-      div.innerHTML = '<div class="card" style="text-align:center;padding:20px"><p style="color:#9CA3AF">Nenhum devedor cadastrado</p></div>';
-      return;
-    }
-    var h = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
-            '<h2 style="font-size:14px;color:#6B7280;text-transform:uppercase">Devedores (' + devedores.length + ')</h2>' +
-            '<button class="btn btn-sm" onclick="exportarCSV()">📥 CSV</button></div>';
-    devedores.forEach(function(d) {
-      h += '<div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;margin-bottom:6px">' +
-           '<div><div style="font-weight:600;font-size:14px">' + esc(d.nome) + '</div>' +
-           '<div style="font-size:11px;color:#9CA3AF">' + d.data + '</div></div>' +
-           '<div style="display:flex;align-items:center;gap:8px">' +
-           '<span style="font-weight:700;color:#059669">R$ ' + esc(d.valor) + '</span>' +
-           '<button class="btn btn-sm" style="background:#DC2626;color:#fff;padding:4px 8px;font-size:11px" onclick="remDev(' + d.id + ')">✕</button></div></div>';
+  var STATUS={"Pendente":{bg:"#FFF3CD",color:"#856404",dot:"#FFC107"},"Pago":{bg:"#D1FAE5",color:"#065F46",dot:"#10B981"},"Pago Parcial":{bg:"#FEE2CC",color:"#92400E",dot:"#F97316"},"Vencido":{bg:"#FEE2E2",color:"#991B1B",dot:"#EF4444"}};
+  var EMPTY={nome:"",contato:"",pix:"",profissao:"",residencia:"",dataEmprestimo:"",valor:"",dataVencimento:"",status:"Pendente",obs:""};
+  var KEY='d_';function chaveDados(){var h=AUTH._clienteHash||'anon';return KEY+h.substring(0,12);}
+  var S={devedores:[],view:"lista",form:{},editId:null,detailId:null,filtro:"Todos",busca:"",msg:""};
+  for(var k in EMPTY)S.form[k]=EMPTY[k];
+  var ICONS={lupa:String.fromCodePoint(0x1F50D),user:String.fromCodePoint(0x1F464),check:String.fromCodePoint(0x2705),x:String.fromCodePoint(0x274C),edit:String.fromCodePoint(0x270F),trash:String.fromCodePoint(0x1F5D1),plus:String.fromCodePoint(0x2795),left:String.fromCodePoint(0x2B05),csv:String.fromCodePoint(0x1F4E5),json:String.fromCodePoint(0x1F4E6),importI:String.fromCodePoint(0x1F4C1)};
+  function fmt(v){var n=parseFloat(String(v).replace(",","."));return isNaN(n)?"R$ 0,00":n.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});}
+  function pv(v){return parseFloat(String(v).replace(",","."))||0;}
+  function esc(t){if(!t)return"";return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  function salvar(arr){try{localStorage.setItem(chaveDados(),JSON.stringify(arr))}catch(e){}S.devedores=arr;render();}
+  function msg(t){S.msg=t;render();setTimeout(function(){S.msg="";render()},2500);}
+  function dload(blob,nome){var url=URL.createObjectURL(blob);var iOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);if(iOS){window.open(url,'_blank');setTimeout(function(){URL.revokeObjectURL(url)},5000);}else{var a=document.createElement("a");a.href=url;a.download=nome;a.target="_blank";document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(url)},1000);}}
+  function expCSV(){if(!S.devedores.length){msg("Nenhum dado!");return;}var h="Nome,Contato,Pix,Profissao,Residencia,DataEmprestimo,Valor,DataVencimento,Status,Obs";var l=S.devedores.map(function(d){return'"'+[d.nome,d.contato||"",d.pix||"",d.profissao||"",d.residencia||"",d.dataEmprestimo||"",d.valor||"",d.dataVencimento||"",d.status,(d.obs||"").replace(/"/g,'""')].join('","')+'"';});dload(new Blob(["\uFEFF"+h+"\n"+l.join("\n")],{type:"text/csv;charset=utf-8;"}),"devedores_"+new Date().toISOString().slice(0,10)+".csv");msg("CSV exportado!");}
+  function expJSON(){if(!S.devedores.length){msg("Nenhum dado!");return;}dload(new Blob([JSON.stringify(S.devedores,null,2)],{type:"application/json"}),"devedores_"+new Date().toISOString().slice(0,10)+".json");msg("JSON exportado!");}
+  function imp(e){var f=e.target.files?e.target.files[0]:null;if(!f)return;var r=new FileReader();r.onload=function(ev){try{var imp;var txt=ev.target.result;if(f.name.endsWith(".csv")){var lin=txt.replace(/\r/g,"").split("\n").filter(function(l){return l.trim();});if(lin.length<2){msg("CSV vazio");return;}var cab=lin[0].split(",").map(function(h){return h.replace(/^"|"$/g,"").trim();});var mapa={"Nome":"nome","Contato":"contato","Pix":"pix","Profissao":"profissao","Residencia":"residencia","DataEmprestimo":"dataEmprestimo","Valor":"valor","DataVencimento":"dataVencimento","Status":"status","Obs":"obs"};imp=[];for(var i=1;i<lin.length;i++){var v=lin[i].split(",").map(function(x){return x.replace(/^"|"$/g,"").trim();});var o={};cab.forEach(function(c,idx){o[mapa[c]||c]=v[idx]||"";});if(o.nome)imp.push(o);}}else{imp=JSON.parse(txt);if(!Array.isArray(imp))throw new Error("Formato invalido");}var novos=imp.map(function(d){var o={};for(var k in EMPTY)o[k]=EMPTY[k];for(var k in d)o[k]=d[k];o.id=Date.now()+Math.random()*10000;return o;});var comb=S.devedores.concat(novos);salvar(comb);msg(novos.length+" registro(s) importado(s)!");}catch(err){msg("Erro: "+err.message);}};if(f.name.endsWith(".csv"))r.readAsText(f,"UTF-8");else r.readAsText(f);e.target.value="";}
+  function submit(){if(!S.form.nome.trim()){msg("Preencha o nome!");return;}var nova;if(S.editId!==null){nova=S.devedores.map(function(d){return d.id===S.editId?Object.assign({},S.form,{id:S.editId}):d;});msg("Atualizado!");}else{nova=S.devedores.concat([Object.assign({},S.form,{id:Date.now()})]);msg("Cadastrado!");}salvar(nova);for(var k in EMPTY)S.form[k]=EMPTY[k];S.editId=null;S.view="lista";render();}
+  function del(id){if(!confirm("Remover?"))return;salvar(S.devedores.filter(function(d){return d.id!==id;}));S.view="lista";msg("Removido!");}
+  function editar(d){for(var k in EMPTY)S.form[k]=EMPTY[k];for(var k in d)S.form[k]=d[k];S.editId=d.id;S.view="form";render();}
+  function render(){var app=document.getElementById("app");app.innerHTML="";if(S.view==="lista")rLista(app);else if(S.view==="form")rForm(app);else if(S.view==="detail")rDetail(app);if(S.msg){var t=document.createElement("div");t.className="toast";t.textContent=S.msg;app.appendChild(t);}}
+  function rDetail(c){var d=S.devedores.find(function(x){return x.id===S.detailId;});if(!d){S.view="lista";render();return;}var cfg=STATUS[d.status]||STATUS["Pendente"];var h='<div class="container">';h+='<div class="bg-header"><div class="flex items-center gap12"><button class="back-btn" onclick="window.vLista()">'+ICONS.left+'</button><div><h1>'+esc(d.nome)+'</h1><div class="sub">Detalhes</div></div></div></div>';h+='<div class="p12"><div class="flex space-between items-center">';h+='<span class="badge" style="background:'+cfg.bg+';color:'+cfg.color+'"><span class="badge-dot" style="background:'+cfg.dot+'"></span>'+esc(d.status)+'</span>';h+='<span class="f22 bold8 blue">'+fmt(d.valor)+'</span></div></div>';h+='<div class="card2"><div class="f11 bold gray2 uppercase ls" style="margin-bottom:10px">'+ICONS.user+' Informacoes</div>';if(d.nome)h+='<div style="margin-bottom:6px"><div class="f11 gray bold uppercase ls">Nome</div><div class="f14 dark" style="margin-top:1px">'+esc(d.nome)+'</div></div>';if(d.contato)h+='<div style="margin-bottom:6px"><div class="f11 gray bold uppercase ls">Contato</div><div class="f14 dark" style="margin-top:1px">'+esc(d.contato)+'</div></div>';if(d.pix)h+='<div style="margin-bottom:6px"><div class="f11 gray bold uppercase ls">Pix</div><div class="f14 dark" style="margin-top:1px">'+esc(d.pix)+'</div></div>';if(d.profissao)h+='<div style="margin-bottom:6px"><div class="f11 gray bold uppercase ls">Profissao</div><div class="f14 dark" style="margin-top:1px">'+esc(d.profissao)+'</div></div>';if(d.residencia)h+='<div style="margin-bottom:6px"><div class="f11 gray bold uppercase ls">Residencia</div><div class="f14 dark" style="margin-top:1px">'+esc(d.residencia)+'</div></div>';h+='</div><div class="card2" style="margin-top:0"><div class="f11 bold gray2 uppercase ls" style="margin-bottom:10px">Divida</div>';if(d.dataEmprestimo)h+='<div style="margin-bottom:6px"><div class="f11 gray bold uppercase ls">Emprestimo</div><div class="f14 dark" style="margin-top:1px">'+esc(d.dataEmprestimo)+'</div></div>';h+='<div style="margin-bottom:6px"><div class="f11 gray bold uppercase ls">Valor</div><div class="f14 dark" style="margin-top:1px">'+fmt(d.valor)+'</div></div>';if(d.dataVencimento)h+='<div style="margin-bottom:6px"><div class="f11 gray bold uppercase ls">Vencimento</div><div class="f14 dark" style="margin-top:1px">'+esc(d.dataVencimento)+'</div></div>';if(d.obs)h+='<div style="margin-bottom:6px"><div class="f11 gray bold uppercase ls">Obs</div><div class="f14 dark" style="margin-top:1px">'+esc(d.obs)+'</div></div>';h+='</div><div class="p12">';h+='<button class="btn btn-primary" onclick="window.eById('+d.id+')">'+ICONS.edit+' Editar</button>';h+='<button class="btn btn-danger" onclick="window.delById('+d.id+')">'+ICONS.trash+' Remover</button>';h+='<button class="btn btn-secondary" onclick="window.vLista()">Voltar</button></div></div>';c.innerHTML=h;}
+  function rForm(c){var tit=S.editId?"Editar":"Novo Devedor";var h='<div class="container"><div class="bg-header"><div class="flex items-center gap12"><button class="back-btn" onclick="window.cancel()">'+ICONS.left+'</button><div><h1>'+tit+'</h1><div class="sub">Preencha os dados</div></div></div></div>';h+='<div class="p12" style="margin-top:16px">';var campos=[["Nome *","nome","text","Joao Silva"],["Contato","contato","tel","(82)99999-9999"],["Pix","pix","text","CPF ou e-mail"],["Profissao","profissao","text","Ex: Comerciante"],["Residencia","residencia","text","Rua, numero"],["Data Emprestimo","dataEmprestimo","date",""],["Valor R$","valor","number","0,00"],["Vencimento","dataVencimento","date",""]];campos.forEach(function(c2){h+='<label class="form-label">'+c2[0]+'</label>';h+='<input class="form-input" type="'+c2[2]+'" placeholder="'+c2[3]+'" value="'+esc(S.form[c2[1]]||"")+'" oninput="window.up(\''+c2[1]+'\',this.value)">';});h+='<label class="form-label">Status</label><select class="form-select" onchange="window.up(\'status\',this.value)">';for(var k in STATUS)h+='<option'+(S.form.status===k?' selected':'')+'>'+k+'</option>';h+='</select><label class="form-label">Obs</label>';h+='<textarea class="form-input" placeholder="Anotacoes..." oninput="window.up(\'obs\',this.value)">'+esc(S.form.obs||"")+'</textarea>';h+='<button class="btn btn-primary" onclick="window.sub()">'+ICONS.check+' '+(S.editId?"Salvar":"Cadastrar")+'</button>';h+='<button class="btn btn-secondary" onclick="window.cancel()">Cancelar</button></div></div>';c.innerHTML=h;}
+  function rLista(c){var fil=S.devedores.filter(function(d){return(S.filtro==="Todos"||d.status===S.filtro)&&d.nome.toLowerCase().indexOf(S.busca.toLowerCase())!==-1;});var total=S.devedores.filter(function(d){return d.status!=="Pago";}).reduce(function(s,d){return s+pv(d.valor);},0);var cnt={};for(var k in STATUS)cnt[k]=0;S.devedores.forEach(function(d){if(cnt[d.status]!==undefined)cnt[d.status]++;});var h='<div class="container">';h+='<div class="bg-header"><div class="flex space-between items-center"><h1>'+ICONS.check+' Controle de Devedores</h1><button onclick="window.sair()" style="background:rgba(255,255,255,.15);border:none;color:#fff;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer">Sair</button></div><div class="sub">'+S.devedores.length+' pessoa'+(S.devedores.length!==1?"s":"")+'</div></div>';h+='<div class="bg-card"><div class="f11 op75 bold uppercase ls">Total em aberto</div>';h+='<div class="f30 bold8 ls2">'+total.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})+'</div>';h+='<div class="flex gap12" style="margin-top:10px">';for(var k in cnt)h+='<div class="stat-item"><div class="stat-num">'+cnt[k]+'</div><div class="stat-lbl">'+k+'</div></div>';h+='</div></div>';h+='<div class="export-row">';h+='<button class="btn-sm btn-green flex1" onclick="window.expCSV()">'+ICONS.csv+' CSV</button>';h+='<button class="btn-sm btn-indigo flex1" onclick="window.expJSON()">'+ICONS.json+' JSON</button>';h+='<label class="import-label">'+ICONS.importI+' Importar<input type="file" accept=".json,.csv" style="display:none" onchange="window.imp(event)"></label></div>';h+='<div class="filter-row">';var fs=["Todos"].concat(Object.keys(STATUS));fs.forEach(function(f){h+='<button class="filter-btn '+(S.filtro===f?"filter-btn-active":"filter-btn-inactive")+'" onclick="window.setF(\''+f+'\')">'+f+'</button>';});h+='</div><div class="search-wrap"><span class="gray2">'+ICONS.lupa+'</span>';h+='<input placeholder="Buscar..." value="'+esc(S.busca)+'" oninput="window.setB(this.value)">';if(S.busca)h+='<button style="background:none;border:none;color:#9CA3AF;cursor:pointer;font-size:16px" onclick="window.setB(\'\')">'+ICONS.x+'</button>';h+='</div>';if(!fil.length){h+='<div class="text-center" style="margin-top:48px;color:#9CA3AF"><div class="f40">'+ICONS.user+'</div><div class="f14">'+(S.devedores.length?"Nada encontrado":"Nenhum devedor ainda")+'</div>';if(!S.devedores.length)h+='<div class="f13 gray3">Toque no +</div>';h+='</div>';}else{fil.forEach(function(d){var cfg=STATUS[d.status]||STATUS["Pendente"];h+='<div class="card" onclick="window.det('+d.id+')">';h+='<div style="padding:12px 14px 10px;border-bottom:1px solid #F1F5F9"><div class="flex space-between items-start">';h+='<div class="f15 bold dark">'+esc(d.nome)+'</div>';h+='<span class="badge" style="background:'+cfg.bg+';color:'+cfg.color+'"><span class="badge-dot" style="background:'+cfg.dot+'"></span>'+esc(d.status)+'</span></div>';var m=[d.profissao,d.residencia].filter(Boolean).join(" - ")||"Sem detalhes";h+='<div class="f12 gray" style="margin-top:2px">'+esc(m)+'</div></div>';h+='<div class="flex space-between items-center" style="padding:10px 14px"><div><div class="f11 gray">Valor</div><div class="f16 bold8 blue">'+fmt(d.valor)+'</div></div>';if(d.dataVencimento)h+='<div class="text-right"><div class="f11 gray">Vencimento</div><div class="f13 bold dark2">'+d.dataVencimento+'</div></div>';h+='<span class="gray3 f20">&rsaquo;</span></div></div>';});}h+='<button class="fab" onclick="window.novo()">'+ICONS.plus+'</button></div>';c.innerHTML=h;}
+  window.vLista=function(){S.view="lista";render();};window.cancel=function(){S.view="lista";for(var k in EMPTY)S.form[k]=EMPTY[k];S.editId=null;render();};window.novo=function(){for(var k in EMPTY)S.form[k]=EMPTY[k];S.editId=null;S.view="form";render();};window.det=function(id){S.detailId=id;S.view="detail";render();};window.setF=function(f){S.filtro=f;render();};window.setB=function(v){S.busca=v;render();};window.up=function(k,v){S.form[k]=v;};window.sub=submit;window.delById=function(id){del(id);};window.eById=function(id){var d=S.devedores.find(function(x){return x.id===id;});if(d)editar(d);};window.expCSV=expCSV;window.expJSON=expJSON;window.imp=imp;
+  var GH_USER = "eberalbarrosmoreira-design";
+  var GH_REPO = "DEVEDORES";
+  var GH_TOKEN = "";
+  
+  function carregarDadosCliente(hashSenha) {
+    var url = "https://api.github.com/repos/" + GH_USER + "/" + GH_REPO + "/contents/dados_" + hashSenha + ".json";
+    return fetch(url, {
+      headers: { "Accept": "application/vnd.github.v3+json" }
+    }).then(function(r) {
+      if (r.status === 404) return null;
+      return r.json();
+    }).then(function(data) {
+      if (!data) {
+        S.devedores = [];
+        render();
+        return;
+      }
+      var content = atob(data.content.replace(/\n/g, ""));
+      var parsed = JSON.parse(content);
+      if (parsed.devedores) S.devedores = parsed.devedores;
+      render();
+    }).catch(function(e) {
+      S.devedores = [];
+      render();
     });
-    div.innerHTML = h;
   }
-
-  function esc(t) {
-    if (!t) return "";
-    return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    function iniciarApp() {
+    try{var raw=localStorage.getItem(chaveDados());if(raw)S.devedores=JSON.parse(raw);}catch(e){}
+    var hc=AUTH._clienteHash||'';
+    if(hc){carregarDadosCliente(hc);}else{render();}
   }
-
   telaAuth();
 })();
 </script>

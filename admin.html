@@ -97,6 +97,7 @@ h2{font-size:16px;color:#94A3B8;margin:20px 0 12px;font-weight:600;text-transfor
     h+='<div class="input-group"><label>Codigo do Dispositivo</label><input type="text" id="iCod" placeholder="Codigo que o cliente enviou"></div>';
     h+='<button class="btn btn-primary" onclick="gerar()">🔑 Gerar Codigo</button>';
     h+='<div class="codigo-gerado" id="cg"><div class="f12 gray bold">✅ Codigo de Ativacao:</div><div class="codigo-texto" id="cgTxt"></div><button class="btn" style="background:#334155;color:#E2E8F0;padding:6px 12px;font-size:12px" onclick="copiar()">📋 Copiar</button></div></div>';
+    h+='<button class="btn btn-sm" style="background:#1E3A5F;color:#93C5FD;width:100%;margin-bottom:8px;border:1px solid #3B82F6" onclick="sincronizar()">🔄 Sincronizar do GitHub</button>';
     h+='<h2>📱 Dispositivos Ativos</h2><div id="listaDis"></div></div>';
     h+='<div id="c2" style="display:none"><div class="card"><h2>🚀 Publicar (1 clique!)</h2><p class="f12 gray mb">Altera o index.html no GitHub com os dados abaixo.</p>';
     h+='<div style="background:#0F172A;border:1px solid #334155;border-radius:10px;padding:12px;font-size:12px;font-family:monospace;white-space:pre-wrap;word-break:break-all;max-height:200px;overflow:auto" id="prev"></div>';
@@ -198,14 +199,26 @@ h2{font-size:16px;color:#94A3B8;margin:20px 0 12px;font-weight:600;text-transfor
   
   window.mt=function(t){
     for(var i=0;i<4;i++){var e=document.getElementById("c"+i);if(e)e.style.display=i===t?"block":"none";var te=document.getElementById("t"+i);if(te)te.className="tab "+(i===t?"tab-active":"tab-inactive");}
-    if(t===1)renderAtivar();if(t===2)renderPrev();
+    if(t===1){renderAtivar();if(cfg.token){carregarAtivacoes().then(function(at){localStorage.setItem(ATIVACOES_KEY,JSON.stringify(at));renderAtivar();});}}if(t===2)renderPrev();
   };
   
   window.gerar=function(){
     var id=parseInt(document.getElementById("sCli").value),cod=document.getElementById("iCod").value.trim();
     if(!id){msg("Selecione cliente!");return;}if(!cod){msg("Digite o codigo!");return;}
     var c=cli.find(function(x){return x.id===id;});if(!c){msg("Cliente nao encontrado!");return;}
-    sha256(cfg.hashMestre+cod).then(function(cg){document.getElementById("cgTxt").textContent=cg;document.getElementById("cg").style.display="block";msg("✅ Codigo gerado!");});
+    sha256(cfg.hashMestre+cod).then(function(cg){
+      document.getElementById("cgTxt").textContent=cg;
+      document.getElementById("cg").style.display="block";
+      msg("✅ Codigo gerado!");
+      if(cfg.token){
+        carregarAtivacoes().then(function(at){
+          at[cod]=c.hash;
+          return salvarAtivacoes(at);
+        }).then(function(){
+          msg("✅ Codigo gerado e salvo no GitHub!");
+        });
+      }
+    });
   };
   
   window.copiar=function(){
@@ -213,8 +226,44 @@ h2{font-size:16px;color:#94A3B8;margin:20px 0 12px;font-weight:600;text-transfor
     navigator.clipboard.writeText(t).then(function(){msg("📋 Copiado!");}).catch(function(){var ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand("copy");document.body.removeChild(ta);msg("📋 Copiado!");});
   };
   
-  window.resetDis=function(){if(!confirm("Resetar TODOS?"))return;localStorage.removeItem(ATIVACOES_KEY);msg("✅ Resetado!");renderAtivar();};
-  window.remDis=function(id){if(!confirm("Remover?"))return;var at=JSON.parse(localStorage.getItem(ATIVACOES_KEY)||"{}");delete at[id];localStorage.setItem(ATIVACOES_KEY,JSON.stringify(at));msg("✅ Removido!");renderAtivar();};
+  window.resetDis=function(){
+    if(!confirm("Resetar TODOS?"))return;
+    localStorage.removeItem(ATIVACOES_KEY);
+    if(cfg.token){
+      salvarAtivacoes({}).then(function(){
+        msg("✅ Resetado e sincronizado no GitHub!");
+        renderAtivar();
+      });
+    } else {
+      msg("✅ Resetado (local)!");
+      renderAtivar();
+    }
+  };
+  window.remDis=function(id){
+    if(!confirm("Remover?"))return;
+    var at=JSON.parse(localStorage.getItem(ATIVACOES_KEY)||"{}");
+    delete at[id];
+    localStorage.setItem(ATIVACOES_KEY,JSON.stringify(at));
+    if(cfg.token){
+      salvarAtivacoes(at).then(function(){
+        msg("✅ Removido e sincronizado no GitHub!");
+        renderAtivar();
+      });
+    } else {
+      msg("✅ Removido (local)!");
+      renderAtivar();
+    }
+  };
+  window.sincronizar=function(){
+    if(!cfg.token){msg("❌ Configure o token na aba Config!");return;}
+    msg("🔄 Sincronizando...");
+    carregarAtivacoes().then(function(at){
+      localStorage.setItem(ATIVACOES_KEY,JSON.stringify(at));
+      msg("✅ Sincronizado! " + Object.keys(at).length + " dispositivo(s) do GitHub.");
+      renderAtivar();
+      renderLista();
+    });
+  };
   
   window.pub=function(){
     var btn=document.getElementById("btnPub"),st=document.getElementById("stPub"),er=document.getElementById("erPub");
