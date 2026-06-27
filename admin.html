@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
@@ -140,6 +140,52 @@ h2{font-size:16px;color:#94A3B8;margin:20px 0 12px;font-weight:600;text-transfor
   
   function gCode(){if(!cli.length)return"{}";var o="{";cli.forEach(function(c,i){if(i>0)o+=",";o+='"'+c.hash+'":'+c.limite;});return o+"}";}
   
+  
+  // --- SINCRONIZACAO COM GITHUB (ativacoes.json) ---
+  var _atCache = null;
+  
+  function carregarAtivacoes() {
+    return new Promise(function(resolve) {
+      var url = API + "/repos/" + cfg.user + "/" + cfg.repo + "/contents/ativacoes.json";
+      if (!cfg.token) return resolve({});
+      fetch(url, {headers: {"Authorization": "token " + cfg.token, "Accept": "application/vnd.github.v3+json"}})
+      .then(function(r) {
+        if (r.status === 404) return resolve({});
+        return r.json();
+      })
+      .then(function(data) {
+        if (!data || data.message) return resolve({});
+        try {
+          var content = atob(data.content.replace(/\n/g, ""));
+          _atCache = JSON.parse(content);
+        } catch(e) { _atCache = {}; }
+        resolve(_atCache || {});
+      })
+      .catch(function() { resolve({}); });
+    });
+  }
+  
+  function salvarAtivacoes(ativacoes) {
+    _atCache = ativacoes;
+    var enc = new TextEncoder(), bytes = enc.encode(JSON.stringify(ativacoes)), bin = "";
+    for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    var b64 = btoa(bin);
+    var url = API + "/repos/" + cfg.user + "/" + cfg.repo + "/contents/ativacoes.json";
+    return fetch(url, {headers: {"Authorization": "token " + cfg.token, "Accept": "application/vnd.github.v3+json"}})
+    .then(function(r) {
+      if (r.status === 404) return null;
+      return r.json();
+    })
+    .then(function(existente) {
+      var sha = existente ? existente.sha : null;
+      var body = {message: "Admin: atualizar ativacoes", content: b64};
+      if (sha) body.sha = sha;
+      return fetch(url, {method: "PUT", headers: {"Authorization": "token " + cfg.token, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json"}, body: JSON.stringify(body)});
+    })
+    .then(function() { return true; })
+    .catch(function(e) { console.error("Erro salvando ativacoes:", e); return false; });
+  }
+  // --- FIM SINCRONIZACAO ---
   window.addCli=function(){
     var n=document.getElementById("iNome").value.trim(),s=document.getElementById("iSenha").value.trim(),l=parseInt(document.getElementById("iLim").value)||2;
     if(!n||!s){msg("Preencha nome e senha!");return;}if(l<1){msg("Limite minimo 1");return;}
